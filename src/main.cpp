@@ -4,9 +4,11 @@
 #include <numbers>
 #include <portaudio.h>
 
-constexpr size_t SAMPLE_RATE	  = 44100;
-constexpr size_t FRAME_PER_BUFFER = 256;
-constexpr size_t SAMPLE_PRECISION = 2048;
+#define _USE_WAVE_TABLE 0
+
+constexpr size_t SAMPLE_RATE			= 44100;
+constexpr size_t FRAME_PER_BUFFER		= 256;
+constexpr size_t WAVE_TABLE_SAMPLE_RATE = 2048;
 
 // Evaluate a sin.
 double evaluateSin( const double p_value, const double p_time )
@@ -17,9 +19,9 @@ double evaluateSin( const double p_value, const double p_time )
 // Generate a sine wave table.
 void generateSampleSine( double * const p_sample )
 {
-	for ( size_t i = 0; i < SAMPLE_PRECISION; i++ )
+	for ( size_t i = 0; i < WAVE_TABLE_SAMPLE_RATE; i++ )
 	{
-		p_sample[ i ] = evaluateSin( double( 1 ), i / double( SAMPLE_PRECISION ) );
+		p_sample[ i ] = evaluateSin( double( 1 ), i / double( WAVE_TABLE_SAMPLE_RATE ) );
 	}
 }
 
@@ -70,14 +72,14 @@ int audioCallbackGenerator( const void *					 p_inputBuffer,
 	return paContinue;
 }
 
-/*
-double sample[ SAMPLE_PRECISION ];
-int audioCallbackSample( const void *					  p_inputBuffer,
-						 void *							  p_outputBuffer,
-						 unsigned long					  p_framesPerBuffer,
-						 const PaStreamCallbackTimeInfo * p_timeInfo,
-						 PaStreamCallbackFlags			  p_statusFlags,
-						 void *							  p_userData )
+// Audio callback that use wave table.
+double sample[ WAVE_TABLE_SAMPLE_RATE ];
+int	   audioCallbackWaveTable( const void *						p_inputBuffer,
+							   void *							p_outputBuffer,
+							   unsigned long					p_framesPerBuffer,
+							   const PaStreamCallbackTimeInfo * p_timeInfo,
+							   PaStreamCallbackFlags			p_statusFlags,
+							   void *							p_userData )
 {
 	StructNote * const note = static_cast<StructNote *>( p_userData );
 	float *			   out	= static_cast<float *>( p_outputBuffer );
@@ -86,22 +88,19 @@ int audioCallbackSample( const void *					  p_inputBuffer,
 
 	for ( unsigned long i = 0; i < p_framesPerBuffer; i++ )
 	{
-		const int	 time  = ( i + samplePhase ) % SAMPLE_PRECISION;
+		const int	 time  = ( i + samplePhase ) % WAVE_TABLE_SAMPLE_RATE;
 		const double value = 0.5 * sample[ time ];
-		// const double value = 0.5 * evaluateSin( midiNoteToFrequency( note->pitch ), time );
-		*out++ = float( value );
-		*out++ = float( value );
-
-		std::cout << value << std::endl;
+		*out++			   = float( value );
+		*out++			   = float( value );
 	}
 
 	samplePhase += p_framesPerBuffer;
 	return paContinue;
 }
-*/
+
 // Global variables.
 auto generator = std::make_unique<StructWaveGenerator>();
-// auto note	   = std::make_unique<StructNote>();
+auto note	   = std::make_unique<StructNote>();
 
 // Midi callback to update data.
 void midiCallback( const libremidi::message & message )
@@ -160,6 +159,12 @@ int main()
 	// Open stream.
 	PaStream * stream;
 
+	// Wave table.
+#if _USE_WAVE_TABLE
+	generateSampleSine( sample );
+	Pa_OpenStream(
+		&stream, NULL, &outputParameters, SAMPLE_RATE, FRAME_PER_BUFFER, paNoFlag, audioCallbackWaveTable, note.get() );
+#else
 	// Generator.
 	Pa_OpenStream( &stream,
 				   NULL,
@@ -169,13 +174,8 @@ int main()
 				   paNoFlag,
 				   audioCallbackGenerator,
 				   generator.get() );
+#endif
 
-	// Or wave table.
-	/*
-	generateSampleSine( sample );
-	Pa_OpenStream(
-		&stream, NULL, &outputParameters, SAMPLE_RATE, FRAME_PER_BUFFER, paNoFlag, audioCallbackSample, note.get() );
-		*/
 	Pa_StartStream( stream );
 
 	// Wait.
