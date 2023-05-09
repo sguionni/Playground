@@ -1,6 +1,8 @@
 #ifndef __PLAYGROUND_SYNTHETIZER__
 #define __PLAYGROUND_SYNTHETIZER__
 
+#include "input_manager.hpp"
+#include "note.hpp"
 #include "oscillator.hpp"
 #include <portaudio.h>
 #include <vector>
@@ -13,15 +15,17 @@ namespace Playground
 	class Synthetizer
 	{
 	  public:
-		Synthetizer();
+		Synthetizer( const InputManager & );
 		~Synthetizer();
 
-		static double midiNoteToFrequency( const int p_note );
-
+		inline const InputManager &		 getInputManager() const { return _inputManager; }
 		inline std::vector<Oscillator> & getOscillators() { return _oscillators; }
 
+		void draw();
+
 	  private:
-		PaStream * _stream;
+		const InputManager & _inputManager;
+		PaStream *			 _stream;
 
 		std::vector<Oscillator> _oscillators;
 	};

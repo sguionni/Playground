@@ -53,8 +53,8 @@ int main( int, char ** )
 	ImGui_ImplOpenGL3_Init( glslVersion );
 
 	// Init playground.
-	Playground::InputManager inputManager;
-	Playground::Synthetizer	 synthetizer;
+	const Playground::InputManager inputManager;
+	Playground::Synthetizer		   synthetizer( inputManager );
 
 	// Main loop.
 	while ( glfwWindowShouldClose( window ) == false )
@@ -65,7 +65,7 @@ int main( int, char ** )
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		// HERE.
+		synthetizer.draw();
 
 		ImGui::Render();
 		int width, height;

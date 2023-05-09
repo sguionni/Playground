@@ -1,5 +1,4 @@
 #include "playground/input_manager.hpp"
-#include <cassert>
 
 namespace Playground
 {
@@ -17,37 +16,28 @@ namespace Playground
 
 		// Open port.
 		_midi.open_port( 0 );
-		// libremidi::midi_in::message_callback * callback = new libremidi::midi_in::message_callback();
-		// auto cb = std::bind( &InputManager::_callback, callback, std::placeholders::_1 );
-		//_midi.set_callback( *callback );
 
+		// Handle messages.
 		_midi.set_callback(
-			[]( const libremidi::message & p_message )
+			[ this ]( const libremidi::message & p_message )
 			{
 				if ( p_message.size() > 0 )
 				{
-					const unsigned char statusByte = p_message[ 0 ];
-					const unsigned char noteByte   = p_message[ 1 ];
-					const int			velocity   = int( p_message[ 2 ] );
-
-					std::cout << noteByte << std::endl;
+					const unsigned char byteStatus	 = p_message[ 0 ];
+					const unsigned char byteKey		 = p_message[ 1 ];
+					const unsigned char byteVelocity = p_message[ 2 ];
 
 					// Key pressed.
-					if ( statusByte == 0x90 )
+					if ( byteStatus == 0x90 )
 					{
-						// generator->frequency = midiNoteToFrequency( noteByte );
-						// generator->amplitude = velocity / double( 128 );
-						//  note->pitch			 = noteByte;
-						// assert( generator->amplitude <= 1.0 );
+						_notes.emplace( byteKey, Note( int( byteKey ), int( byteVelocity ) ) );
 					}
 					// Key released.
-					else if ( statusByte == 0x80 )
+					else if ( byteStatus == 0x80 )
 					{
-						// generator->frequency = 0.0;
-						// generator->amplitude = 0.0;
+						assert( _notes.contains( byteKey ) );
+						_notes.erase( byteKey );
 					}
-
-					// TODO: handle multiple keys.
 				}
 			} );
 	}

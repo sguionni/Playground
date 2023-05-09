@@ -1,4 +1,5 @@
 #include "playground/synthetizer.hpp"
+#include <imgui/imgui-knobs.h>
 #include <iostream>
 
 namespace Playground
@@ -19,7 +20,8 @@ namespace Playground
 			double value = 0;
 			for ( const Oscillator & o : in->getOscillators() )
 			{
-				value += o.evaluate( SAMPLE_RATE, i );
+				for ( const auto & note : in->getInputManager().getNotes() )
+					value += o.evaluate( SAMPLE_RATE, i, note.second );
 			}
 
 			// std::cout << value << std::endl;
@@ -36,7 +38,7 @@ namespace Playground
 		return paContinue;
 	}
 
-	Synthetizer::Synthetizer()
+	Synthetizer::Synthetizer( const InputManager & p_inputManager ) : _inputManager( p_inputManager )
 	{
 		// Init Port audio.
 		Pa_Initialize();
@@ -65,12 +67,12 @@ namespace Playground
 		Pa_Terminate();
 	}
 
-	double Synthetizer::midiNoteToFrequency( const int p_note )
+	void Synthetizer::draw()
 	{
-		// LA.
-		// 69 is midi LA?
-		// 12 is aoctave count?
-		return 440.0 * pow( 2.0, ( p_note - 69 ) / 12.0 );
+		for ( Oscillator & o : _oscillators )
+		{
+			ImGuiKnobs::KnobInt( "Freq", o.frequency(), 0, 880, 1, "%dhz", ImGuiKnobVariant_Tick );
+			ImGuiKnobs::Knob( "Amp", o.amplitude(), 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick );
+		}
 	}
-
 } // namespace Playground
