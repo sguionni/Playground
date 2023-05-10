@@ -12,19 +12,45 @@ namespace Playground
 				   PaStreamCallbackFlags			p_statusFlags,
 				   void *							p_userData )
 	{
-		auto out = static_cast<float *>( p_outputBuffer );
-		auto in	 = static_cast<Synthetizer *>( p_userData );
+		auto out   = static_cast<float *>( p_outputBuffer );
+		auto in	   = static_cast<Synthetizer *>( p_userData );
+		auto notes = in->getInputManager().getNotes();
 
+		static bool playing = false;
+
+		// Stop.
+		if ( notes.empty() )
+		{
+			if ( playing )
+			{
+				for ( Oscillator & o : in->getOscillators() )
+				{
+					o.reset();
+				}
+				playing = false;
+			}
+
+			for ( unsigned int i = 0; i < p_framesPerBuffer; i++ )
+			{
+				*out++ = 0.f;
+				*out++ = 0.f;
+			}
+
+			return paContinue;
+		}
+
+		// Playing.
+		playing = true;
 		for ( unsigned int i = 0; i < p_framesPerBuffer; i++ )
 		{
 			double value = 0;
-			for ( const Oscillator & o : in->getOscillators() )
+			for ( Oscillator & o : in->getOscillators() )
 			{
-				for ( const auto & note : in->getInputManager().getNotes() )
+				for ( const auto & note : notes )
+				{
 					value += o.evaluate( SAMPLE_RATE, i, note.second );
+				}
 			}
-
-			// std::cout << value << std::endl;
 
 			*out++ = float( value );
 			*out++ = float( value );
@@ -32,7 +58,10 @@ namespace Playground
 
 		for ( Oscillator & o : in->getOscillators() )
 		{
-			o.movePhase( p_framesPerBuffer );
+			for ( const auto & note : notes )
+			{
+				o.move( SAMPLE_RATE, p_framesPerBuffer );
+			}
 		}
 
 		return paContinue;
@@ -71,8 +100,17 @@ namespace Playground
 	{
 		for ( Oscillator & o : _oscillators )
 		{
-			ImGuiKnobs::KnobInt( "Freq", o.frequency(), 0, 880, 1, "%dhz", ImGuiKnobVariant_Tick );
-			ImGuiKnobs::Knob( "Amp", o.amplitude(), 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick );
+			if ( ImGuiKnobs::KnobInt( "Freq", o.frequency(), -440, 440, 1, "%dhz", ImGuiKnobVariant_Tick ) ) {}
+			if ( ImGuiKnobs::Knob( "Amp", o.amplitude(), 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick ) )
+			{
+				o.refreshSample();
+			}
+			if ( ImGuiKnobs::Knob(
+					 "Phase", o.phase(), -std::numbers::pi, std::numbers::pi, 0.01f, "%.2f", ImGuiKnobVariant_Tick ) )
+			{
+				o.refreshSample();
+			}
+			ImGui::PlotLines( "", o.sample(), SAMPLE_SIZE, 0, "", -1.0f, 1.0f, ImVec2( 400, 100 ) );
 		}
 	}
 } // namespace Playground

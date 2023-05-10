@@ -13,7 +13,11 @@ namespace Playground
 		inline int getNote() const { return _note; }
 		inline int getVelocity() const { return _velocity; }
 
-		inline int	 apply( const int p_freq ) const { return int( p_freq * pow( 2.0, ( _note - 69 ) / 12.0 ) ); }
+		inline int apply( const int p_freq ) const
+		{
+			return int( ( p_freq + 440 ) * pow( 2.0, ( _note - 69 ) / 12.0 ) );
+		}
+
 		inline float apply( const float p_amp ) const { return float( p_amp * ( _velocity / 127.0 ) ); }
 
 	  private:
