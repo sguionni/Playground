@@ -13,7 +13,7 @@ namespace Playground
 	class Oscillator
 	{
 	  public:
-		Oscillator() { refreshSample(); }
+		inline virtual std::string getName() = 0;
 
 		inline double evaluate( const size_t p_rate, const unsigned int p_time, const Note & p_note )
 		{
@@ -21,6 +21,7 @@ namespace Playground
 			return _evaluate( _phase, p_note.apply( _detune ), p_note.apply( _amplitude ), time );
 		}
 
+		inline bool *  active() { return &_active; }
 		inline float * phase() { return &_phase; }
 		inline int *   detune() { return &_detune; }
 		inline float * amplitude() { return &_amplitude; }
@@ -43,6 +44,7 @@ namespace Playground
 		}
 
 	  private:
+		bool  _active	 = true;
 		float _phase	 = 0.f;
 		int	  _detune	 = 0;
 		float _amplitude = 0.5f;
@@ -50,9 +52,41 @@ namespace Playground
 
 		int _cursor = 0;
 
-		inline double _evaluate( const float p_phase, const int p_freq, const float p_amp, const double p_time ) const
+		inline virtual double _evaluate( const float  p_phase,
+										 const int	  p_freq,
+										 const float  p_amp,
+										 const double p_time ) const
+			= 0;
+	};
+
+	class OscillatorSin : public Oscillator
+	{
+	  private:
+		inline virtual std::string getName() { return "Sin"; }
+
+		inline double _evaluate( const float  p_phase,
+								 const int	  p_freq,
+								 const float  p_amp,
+								 const double p_time ) const override
 		{
 			return p_amp * std::sin( p_phase + p_freq * ( 2.0 * std::numbers::pi * p_time ) );
+		}
+	};
+
+	class OscillatorSaw : public Oscillator
+	{
+	  private:
+		inline virtual std::string getName() { return "Saw"; }
+
+		inline double _evaluate( const float  p_phase,
+								 const int	  p_freq,
+								 const float  p_amp,
+								 const double p_time ) const override
+		{
+			return p_amp
+					   * ( ( 2 / ( 1.0 / p_freq ) ) * ( ( p_time * p_freq ) - std::floor( p_time * p_freq + 0.5 ) )
+						   - 1 )
+				   + p_phase;
 		}
 	};
 

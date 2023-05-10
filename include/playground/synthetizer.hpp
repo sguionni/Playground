@@ -15,11 +15,14 @@ namespace Playground
 	class Synthetizer
 	{
 	  public:
+		float output[ FRAME_PER_BUFFER ];
+
 		Synthetizer( const InputManager & );
 		~Synthetizer();
 
-		inline const InputManager &		 getInputManager() const { return _inputManager; }
-		inline std::vector<Oscillator> & getOscillators() { return _oscillators; }
+		inline const InputManager &		   getInputManager() const { return _inputManager; }
+		inline std::vector<Oscillator *> & getOscillators() { return _oscillators; }
+		inline float					   getVolume() const { return _volume; }
 
 		void draw();
 
@@ -27,7 +30,8 @@ namespace Playground
 		const InputManager & _inputManager;
 		PaStream *			 _stream;
 
-		std::vector<Oscillator> _oscillators;
+		std::vector<Oscillator *> _oscillators;
+		float					  _volume = 1.f;
 	};
 
 } // namespace Playground

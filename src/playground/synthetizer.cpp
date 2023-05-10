@@ -23,17 +23,18 @@ namespace Playground
 		{
 			if ( playing )
 			{
-				for ( Oscillator & o : in->getOscillators() )
+				for ( Oscillator * const o : in->getOscillators() )
 				{
-					o.reset();
+					o->reset();
 				}
 				playing = false;
 			}
 
 			for ( unsigned int i = 0; i < p_framesPerBuffer; i++ )
 			{
-				*out++ = 0.f;
-				*out++ = 0.f;
+				*out++			= 0.f;
+				*out++			= 0.f;
+				in->output[ i ] = 0.f;
 			}
 
 			return paContinue;
@@ -44,23 +45,30 @@ namespace Playground
 		for ( unsigned int i = 0; i < p_framesPerBuffer; i++ )
 		{
 			double value = 0;
-			for ( Oscillator & o : in->getOscillators() )
+			for ( Oscillator * const o : in->getOscillators() )
 			{
+				if ( *o->active() == false )
+				{
+					continue;
+				}
+
 				for ( const auto & note : notes )
 				{
-					value += o.evaluate( SAMPLE_RATE, i, note.second );
+					// TODO: not the thing to do.
+					value += o->evaluate( SAMPLE_RATE, i, note.second );
 				}
 			}
 
-			*out++ = float( value );
-			*out++ = float( value );
+			*out++			= float( in->getVolume() * value );
+			*out++			= float( in->getVolume() * value );
+			in->output[ i ] = float( in->getVolume() * value );
 		}
 
-		for ( Oscillator & o : in->getOscillators() )
+		for ( Oscillator * const o : in->getOscillators() )
 		{
 			for ( const auto & note : notes )
 			{
-				o.move( SAMPLE_RATE, p_framesPerBuffer );
+				o->move( SAMPLE_RATE, p_framesPerBuffer );
 			}
 		}
 
@@ -82,7 +90,13 @@ namespace Playground
 		Pa_OpenStream( &_stream, nullptr, &outputParameters, SAMPLE_RATE, FRAME_PER_BUFFER, paNoFlag, _callback, this );
 
 		// Add oscillators.
-		_oscillators.emplace_back( Oscillator() );
+		_oscillators.emplace_back( new OscillatorSin() );
+		_oscillators.emplace_back( new OscillatorSaw() );
+
+		for ( Oscillator * const o : _oscillators )
+		{
+			o->refreshSample();
+		}
 
 		// Start.
 		Pa_StartStream( _stream );
@@ -94,26 +108,50 @@ namespace Playground
 		Pa_StopStream( _stream );
 		Pa_CloseStream( _stream );
 		Pa_Terminate();
+
+		for ( Oscillator * const o : _oscillators )
+		{
+			delete o;
+		}
 	}
 
 	void Synthetizer::draw()
 	{
-		for ( Oscillator & o : _oscillators )
+		for ( Oscillator * const o : _oscillators )
 		{
-			if ( ImGuiKnobs::KnobInt( "Detune", o.detune(), -440, 440, 1, "%dhz", ImGuiKnobVariant_Tick ) ) {}
-			ImGui::SameLine();
-			if ( ImGuiKnobs::Knob( "Amplitude", o.amplitude(), 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick ) )
+			ImGui::SetNextItemOpen( true );
+			if ( ImGui::TreeNode( o->getName().c_str() ) )
 			{
-				o.refreshSample();
+				if ( ImGuiKnobs::KnobInt( "Detune", o->detune(), -440, 440, 1, "%dhz", ImGuiKnobVariant_Tick ) ) {}
+				ImGui::SameLine();
+				if ( ImGuiKnobs::Knob( "Amplitude", o->amplitude(), 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick ) )
+				{
+					o->refreshSample();
+				}
+				ImGui::SameLine();
+				if ( ImGuiKnobs::Knob( "Phase",
+									   o->phase(),
+									   -std::numbers::pi,
+									   std::numbers::pi,
+									   0.01f,
+									   "%.2f",
+									   ImGuiKnobVariant_Tick ) )
+				{
+					o->refreshSample();
+				}
+				ImGui::SameLine();
+				ImGui::PlotLines( "", o->sample(), SAMPLE_SIZE, 0, "Wave", -1.0f, 1.0f, ImVec2( 400, 100 ) );
+				ImGui::SameLine();
+				ImGui::Checkbox( "Active", o->active() );
+
+				ImGui::TreePop();
 			}
-			ImGui::SameLine();
-			if ( ImGuiKnobs::Knob(
-					 "Phase", o.phase(), -std::numbers::pi, std::numbers::pi, 0.01f, "%.2f", ImGuiKnobVariant_Tick ) )
-			{
-				o.refreshSample();
-			}
-			ImGui::SameLine();
-			ImGui::PlotLines( "", o.sample(), SAMPLE_SIZE, 0, "", -1.0f, 1.0f, ImVec2( 400, 100 ) );
 		}
+
+		static int outputDisplay = FRAME_PER_BUFFER;
+		ImGui::PlotLines( "", output, outputDisplay, 0, "Output", -1.0f, 1.0f, ImVec2( 600, 150 ) );
+		ImGui::SameLine();
+		ImGuiKnobs::Knob( "Volume", &_volume, 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick );
+		ImGui::SliderInt( "Size", &outputDisplay, 1, FRAME_PER_BUFFER );
 	}
 } // namespace Playground
