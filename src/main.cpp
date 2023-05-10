@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #define GLFW_INCLUDE_NONE
 #include "playground/input_manager.hpp"
+#include "playground/renderer.hpp"
 #include "playground/synthetizer.hpp"
 #include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
@@ -18,10 +19,14 @@ static void glfwErrorCallback( int error, const char * description )
 
 int main( int, char ** )
 {
+	using namespace Playground;
+
 	// Init glfw window.
 	glfwSetErrorCallback( glfwErrorCallback );
-	if ( !glfwInit() )
-		return 1;
+	if ( glfwInit() == 0 )
+	{
+		return EXIT_FAILURE;
+	}
 
 	const char * glslVersion = "#version 450 core";
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
@@ -53,28 +58,39 @@ int main( int, char ** )
 	ImGui_ImplOpenGL3_Init( glslVersion );
 
 	// Init playground.
-	const Playground::InputManager inputManager;
-	Playground::Synthetizer		   synthetizer( inputManager );
-
-	// Main loop.
-	while ( glfwWindowShouldClose( window ) == false )
+	int code = EXIT_SUCCESS;
+	try
 	{
-		glfwPollEvents();
+		const InputManager inputManager;
+		Synthetizer		   synthetizer( inputManager );
+		Renderer		   renderer( WIDTH, HEIGHT );
 
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		// Main loop.
+		while ( glfwWindowShouldClose( window ) == false )
+		{
+			glfwPollEvents();
 
-		synthetizer.draw();
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
 
-		ImGui::Render();
-		int width, height;
-		glfwGetFramebufferSize( window, &width, &height );
-		glViewport( 0, 0, width, height );
-		glClear( GL_COLOR_BUFFER_BIT );
-		ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+			synthetizer.draw();
 
-		glfwSwapBuffers( window );
+			ImGui::Render();
+			// int width, height;
+			// glfwGetFramebufferSize( window, &width, &height );
+
+			renderer.render( 0.0 );
+
+			ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+
+			glfwSwapBuffers( window );
+		}
+	}
+	catch ( const std::exception & p_e )
+	{
+		std::cout << p_e.what() << std::endl;
+		code = EXIT_FAILURE;
 	}
 
 	// Clean.
@@ -85,5 +101,5 @@ int main( int, char ** )
 	glfwDestroyWindow( window );
 	glfwTerminate();
 
-	return 0;
+	return code;
 }

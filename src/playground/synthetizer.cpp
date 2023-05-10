@@ -91,7 +91,6 @@ namespace Playground
 
 		// Add oscillators.
 		_oscillators.emplace_back( new OscillatorSin() );
-		_oscillators.emplace_back( new OscillatorSaw() );
 
 		for ( Oscillator * const o : _oscillators )
 		{
@@ -117,12 +116,16 @@ namespace Playground
 
 	void Synthetizer::draw()
 	{
+		ImGui::Begin( "Synth" );
 		for ( Oscillator * const o : _oscillators )
 		{
 			ImGui::SetNextItemOpen( true );
 			if ( ImGui::TreeNode( o->getName().c_str() ) )
 			{
-				if ( ImGuiKnobs::KnobInt( "Detune", o->detune(), -440, 440, 1, "%dhz", ImGuiKnobVariant_Tick ) ) {}
+				if ( ImGuiKnobs::KnobInt( "Shift", o->shift(), -440, 440, 1, "%dhz", ImGuiKnobVariant_Tick ) )
+				{
+					// TODO: move cursor to avoid krrrrrrrr.
+				}
 				ImGui::SameLine();
 				if ( ImGuiKnobs::Knob( "Amplitude", o->amplitude(), 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick ) )
 				{
@@ -153,5 +156,7 @@ namespace Playground
 		ImGui::SameLine();
 		ImGuiKnobs::Knob( "Volume", &_volume, 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick );
 		ImGui::SliderInt( "Size", &outputDisplay, 1, FRAME_PER_BUFFER );
+
+		ImGui::End();
 	}
 } // namespace Playground
