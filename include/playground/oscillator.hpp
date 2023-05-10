@@ -18,11 +18,11 @@ namespace Playground
 		inline double evaluate( const size_t p_rate, const unsigned int p_time, const Note & p_note )
 		{
 			const double time = ( p_time + _cursor ) / double( p_rate );
-			return _evaluate( _phase, p_note.apply( _frequency ), p_note.apply( _amplitude ), time );
+			return _evaluate( _phase, p_note.apply( _detune ), p_note.apply( _amplitude ), time );
 		}
 
 		inline float * phase() { return &_phase; }
-		inline int *   frequency() { return &_frequency; }
+		inline int *   detune() { return &_detune; }
 		inline float * amplitude() { return &_amplitude; }
 		inline float * sample() { return _sample; }
 
@@ -44,7 +44,7 @@ namespace Playground
 
 	  private:
 		float _phase	 = 0.f;
-		int	  _frequency = 0;
+		int	  _detune	 = 0;
 		float _amplitude = 0.5f;
 		float _sample[ SAMPLE_SIZE ];
 

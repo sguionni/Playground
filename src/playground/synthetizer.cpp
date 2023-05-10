@@ -100,16 +100,19 @@ namespace Playground
 	{
 		for ( Oscillator & o : _oscillators )
 		{
-			if ( ImGuiKnobs::KnobInt( "Freq", o.frequency(), -440, 440, 1, "%dhz", ImGuiKnobVariant_Tick ) ) {}
-			if ( ImGuiKnobs::Knob( "Amp", o.amplitude(), 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick ) )
+			if ( ImGuiKnobs::KnobInt( "Detune", o.detune(), -440, 440, 1, "%dhz", ImGuiKnobVariant_Tick ) ) {}
+			ImGui::SameLine();
+			if ( ImGuiKnobs::Knob( "Amplitude", o.amplitude(), 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick ) )
 			{
 				o.refreshSample();
 			}
+			ImGui::SameLine();
 			if ( ImGuiKnobs::Knob(
 					 "Phase", o.phase(), -std::numbers::pi, std::numbers::pi, 0.01f, "%.2f", ImGuiKnobVariant_Tick ) )
 			{
 				o.refreshSample();
 			}
+			ImGui::SameLine();
 			ImGui::PlotLines( "", o.sample(), SAMPLE_SIZE, 0, "", -1.0f, 1.0f, ImVec2( 400, 100 ) );
 		}
 	}
