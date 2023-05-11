@@ -57,18 +57,19 @@ namespace Playground
 		// Uniforms.
 		_uniform = glGetUniformLocation( _program, "u_time" );
 
+		// VBO.
+		glCreateBuffers( 1, &_vbo );
+		glNamedBufferData( _vbo, sizeof( vertices ), vertices, GL_STATIC_DRAW );
+
 		// VAO.
 		glGenVertexArrays( 1, &_vao );
 		glBindVertexArray( _vao );
 
-		// VBO.
-		glGenBuffers( 1, &_vbo );
-		glBindBuffer( GL_ARRAY_BUFFER, _vbo );
-		glBufferData( GL_ARRAY_BUFFER, sizeof( vertices ), vertices, GL_STATIC_DRAW );
-
-		// Vertex attributes.
-		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( float ), (void *)0 );
-		glEnableVertexAttribArray( 0 );
+		// VAO attributes.
+		glEnableVertexArrayAttrib( _vao, 0 );
+		glVertexArrayVertexBuffer( _vao, 0, _vbo, 0, 2 * sizeof( float ) );
+		glVertexArrayAttribFormat( _vao, 0, 2, GL_FLOAT, GL_FALSE, 0 );
+		glVertexArrayAttribBinding( _vao, 0, 0 );
 	}
 
 	Renderer::~Renderer()

@@ -47,7 +47,7 @@ namespace Playground
 			double value = 0;
 			for ( Oscillator * const o : in->getOscillators() )
 			{
-				if ( *o->active() == false )
+				if ( o->active() == false )
 				{
 					continue;
 				}
@@ -91,6 +91,7 @@ namespace Playground
 
 		// Add oscillators.
 		_oscillators.emplace_back( new OscillatorSin() );
+		_oscillators.emplace_back( new OscillatorSin() );
 
 		for ( Oscillator * const o : _oscillators )
 		{
@@ -120,35 +121,7 @@ namespace Playground
 		for ( Oscillator * const o : _oscillators )
 		{
 			ImGui::SetNextItemOpen( true );
-			if ( ImGui::TreeNode( o->getName().c_str() ) )
-			{
-				if ( ImGuiKnobs::KnobInt( "Shift", o->shift(), -440, 440, 1, "%dhz", ImGuiKnobVariant_Tick ) )
-				{
-					// TODO: move cursor to avoid krrrrrrrr.
-				}
-				ImGui::SameLine();
-				if ( ImGuiKnobs::Knob( "Amplitude", o->amplitude(), 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick ) )
-				{
-					o->refreshSample();
-				}
-				ImGui::SameLine();
-				if ( ImGuiKnobs::Knob( "Phase",
-									   o->phase(),
-									   -std::numbers::pi,
-									   std::numbers::pi,
-									   0.01f,
-									   "%.2f",
-									   ImGuiKnobVariant_Tick ) )
-				{
-					o->refreshSample();
-				}
-				ImGui::SameLine();
-				ImGui::PlotLines( "", o->sample(), SAMPLE_SIZE, 0, "Wave", -1.0f, 1.0f, ImVec2( 400, 100 ) );
-				ImGui::SameLine();
-				ImGui::Checkbox( "Active", o->active() );
-
-				ImGui::TreePop();
-			}
+			o->draw();
 		}
 
 		ImGui::PlotLines( "", output, FRAME_PER_BUFFER, 0, "Output", -1.0f, 1.0f, ImVec2( 600, 150 ) );
