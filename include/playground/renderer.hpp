@@ -12,7 +12,7 @@ namespace Playground
 		~Renderer();
 
 		void resize( const size_t p_width, const size_t p_height );
-		void render( const float p_time );
+		void render( const double p_time );
 
 	  private:
 		size_t _width;
@@ -23,6 +23,7 @@ namespace Playground
 		unsigned int _vs	  = GL_INVALID_INDEX;
 		unsigned int _fs	  = GL_INVALID_INDEX;
 		unsigned int _program = GL_INVALID_INDEX;
+		unsigned int _uniform = GL_INVALID_INDEX;
 
 		static void APIENTRY _debugMessageCallback( const GLenum   p_source,
 													const GLenum   p_type,

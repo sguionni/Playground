@@ -12,9 +12,9 @@
 constexpr size_t WIDTH	= 1280;
 constexpr size_t HEIGHT = 800;
 
-static void glfwErrorCallback( int error, const char * description )
+static void glfwErrorCallback( int p_error, const char * p_description )
 {
-	// fprintf( stderr, "GLFW Error %d: %s\n", error, description );
+	std::cout << "GLFW Error: " << p_error << ": " << p_description << std::endl;
 }
 
 int main( int, char ** )
@@ -80,8 +80,11 @@ int main( int, char ** )
 			// int width, height;
 			// glfwGetFramebufferSize( window, &width, &height );
 
-			renderer.render( 0.0 );
-
+			renderer.render( glfwGetTime() );
+			glfwSetWindowTitle(
+				window,
+				( std::string( "Playground " ) + std::to_string( int( ImGui::GetIO().Framerate ) ) + "FPS" ).c_str() );
+			ImGui::GetIO().Framerate;
 			ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 
 			glfwSwapBuffers( window );

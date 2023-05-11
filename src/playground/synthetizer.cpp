@@ -151,11 +151,9 @@ namespace Playground
 			}
 		}
 
-		static int outputDisplay = FRAME_PER_BUFFER;
-		ImGui::PlotLines( "", output, outputDisplay, 0, "Output", -1.0f, 1.0f, ImVec2( 600, 150 ) );
+		ImGui::PlotLines( "", output, FRAME_PER_BUFFER, 0, "Output", -1.0f, 1.0f, ImVec2( 600, 150 ) );
 		ImGui::SameLine();
 		ImGuiKnobs::Knob( "Volume", &_volume, 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick );
-		ImGui::SliderInt( "Size", &outputDisplay, 1, FRAME_PER_BUFFER );
 
 		ImGui::End();
 	}

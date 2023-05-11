@@ -30,10 +30,11 @@ namespace Playground
 		// FS.
 		const char * fragmentShaderSource
 			= "#version 450 core\n"
+			  "uniform float u_time;"
 			  "out vec4 fragColor;\n"
 			  "void main()\n"
 			  "{\n"
-			  "   fragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+			  "   fragColor = vec4((sin(u_time) / 2.0f) + 0.5f, 0.5f, 0.2f, 1.0f);\n"
 			  "}\0";
 		_fs = glCreateShader( GL_FRAGMENT_SHADER );
 		glShaderSource( _fs, 1, &fragmentShaderSource, nullptr );
@@ -53,6 +54,9 @@ namespace Playground
 		glAttachShader( _program, _fs );
 		glLinkProgram( _program );
 
+		// Uniforms.
+		_uniform = glGetUniformLocation( _program, "u_time" );
+
 		// VAO.
 		glGenVertexArrays( 1, &_vao );
 		glBindVertexArray( _vao );
@@ -63,7 +67,7 @@ namespace Playground
 		glBufferData( GL_ARRAY_BUFFER, sizeof( vertices ), vertices, GL_STATIC_DRAW );
 
 		// Vertex attributes.
-		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), (void *)0 );
+		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( float ), (void *)0 );
 		glEnableVertexAttribArray( 0 );
 	}
 
@@ -76,10 +80,11 @@ namespace Playground
 
 	void Renderer::resize( const size_t p_width, const size_t p_height ) {}
 
-	void Renderer::render( const float p_time )
+	void Renderer::render( const double p_time )
 	{
 		glClear( GL_COLOR_BUFFER_BIT );
 		glUseProgram( _program );
+		glUniform1f( _uniform, float( p_time ) );
 		glBindVertexArray( _vao );
 		glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 	}
