@@ -27,6 +27,10 @@ namespace Playground
 				{
 					o->reset();
 				}
+				for ( Filter * const f : in->getFilters() )
+				{
+					f->reset();
+				}
 				playing = false;
 			}
 
@@ -45,6 +49,8 @@ namespace Playground
 		for ( unsigned int i = 0; i < p_framesPerBuffer; i++ )
 		{
 			double value = 0;
+
+			// Osc.
 			for ( Oscillator * const o : in->getOscillators() )
 			{
 				if ( o->active() == false )
@@ -57,6 +63,17 @@ namespace Playground
 					// TODO: not the thing to do.
 					value += o->evaluate( SAMPLE_RATE, i, note.second );
 				}
+			}
+
+			// Filters.
+			for ( Filter * const f : in->getFilters() )
+			{
+				if ( f->active() == false )
+				{
+					continue;
+				}
+
+				value = f->process( SAMPLE_RATE, value );
 			}
 
 			*out++			= float( in->getVolume() * value );
@@ -91,11 +108,21 @@ namespace Playground
 
 		// Add oscillators.
 		_oscillators.emplace_back( new OscillatorSin() );
-		_oscillators.emplace_back( new OscillatorSin() );
+		_oscillators.emplace_back( new OscillatorSaw() );
+		_oscillators.emplace_back( new OscillatorSquare() );
+		_oscillators.emplace_back( new OscillatorTriangle() );
 
+		// Add filters.
+		//_filters.emplace_back( new FilterLowPass() );
+
+		// Inits.
 		for ( Oscillator * const o : _oscillators )
 		{
-			o->refreshSample();
+			o->init( SAMPLE_RATE );
+		}
+		for ( Filter * const f : _filters )
+		{
+			f->init( SAMPLE_RATE );
 		}
 
 		// Start.
@@ -113,15 +140,24 @@ namespace Playground
 		{
 			delete o;
 		}
+		for ( Filter * const f : _filters )
+		{
+			delete f;
+		}
 	}
 
 	void Synthetizer::draw()
 	{
-		ImGui::Begin( "Synth" );
+		ImGui::Begin( getName().c_str() );
 		for ( Oscillator * const o : _oscillators )
 		{
 			ImGui::SetNextItemOpen( true );
 			o->draw();
+		}
+		for ( Filter * const f : _filters )
+		{
+			ImGui::SetNextItemOpen( true );
+			f->draw();
 		}
 
 		ImGui::PlotLines( "", output, FRAME_PER_BUFFER, 0, "Output", -1.0f, 1.0f, ImVec2( 600, 150 ) );
