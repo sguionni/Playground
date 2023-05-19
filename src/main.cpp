@@ -61,10 +61,12 @@ int main( int, char ** )
 	int code = EXIT_SUCCESS;
 	try
 	{
-		const InputManager inputManager;
-		Synthetizer		   synthetizer( inputManager );
-		Renderer		   renderer( WIDTH, HEIGHT );
-
+		const InputManager	   inputManager;
+		Synthetizer			   synthetizer( inputManager );
+		static Renderer		   renderer( WIDTH, HEIGHT );
+		GLFWframebuffersizefun resizeFunction
+			= []( GLFWwindow * p_window, int p_width, int p_height ) { renderer.resize( p_width, p_height ); };
+		glfwSetFramebufferSizeCallback( window, resizeFunction );
 		// Main loop.
 		while ( glfwWindowShouldClose( window ) == false )
 		{

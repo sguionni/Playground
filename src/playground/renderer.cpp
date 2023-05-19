@@ -79,10 +79,15 @@ namespace Playground
 		glDeleteProgram( _program );
 	}
 
-	void Renderer::resize( const size_t p_width, const size_t p_height ) {}
+	void Renderer::resize( const size_t p_width, const size_t p_height )
+	{
+		_width	= p_width;
+		_height = p_height;
+	}
 
 	void Renderer::render( const double p_time )
 	{
+		glViewport( 0, 0, GLsizei( _width ), GLsizei( _height ) );
 		glClear( GL_COLOR_BUFFER_BIT );
 		glUseProgram( _program );
 		glUniform1f( _uniform, float( p_time ) );
