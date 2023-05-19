@@ -2,6 +2,7 @@
 #define __PLAYGROUND_FILTER__
 
 #include "base_audio_element.hpp"
+#include <cmath>
 #include <numbers>
 
 namespace Playground
