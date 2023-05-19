@@ -1,6 +1,7 @@
 #ifndef __PLAYGROUND_RENDERER__
 #define __PLAYGROUND_RENDERER__
 
+#include <cstddef>
 #include <glad/glad.h>
 
 namespace Playground
