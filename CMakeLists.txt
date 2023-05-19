@@ -31,8 +31,8 @@ add_custom_command(TARGET PLAYGROUND POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
 target_compile_features(PLAYGROUND PUBLIC cxx_std_20)
 
 if(CMAKE_COMPILER_IS_GNUCC)
-	target_compile_options(VTX_UTIL PUBLIC "-Wpedantic")
-	target_compile_options(VTX_UTIL PUBLIC "-Wall")
+	target_compile_options(PLAYGROUND PUBLIC "-Wpedantic")
+	target_compile_options(PLAYGROUND PUBLIC "-Wall")
 elseif(MSVC)
 	# General.
 	
