@@ -27,11 +27,15 @@ target_link_libraries(PLAYGROUND PRIVATE libremidi)
 # Copy dll.
 add_custom_command(TARGET PLAYGROUND POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:libremidi> $<TARGET_FILE_DIR:PLAYGROUND>)
 
+# Compile options.
+target_compile_features(PLAYGROUND PUBLIC cxx_std_20)
+
 if(CMAKE_COMPILER_IS_GNUCC)
-	target_compile_options(PLAYGROUND PUBLIC "-w")
+	target_compile_options(VTX_UTIL PUBLIC "-Wpedantic")
+	target_compile_options(VTX_UTIL PUBLIC "-Wall")
 elseif(MSVC)
 	# General.
-	target_compile_features(PLAYGROUND PUBLIC cxx_std_20)
+	
 	target_compile_options(PLAYGROUND PUBLIC "/W3")  # Warning level 3.
 	target_compile_options(PLAYGROUND PUBLIC "/WX")  # Warnings as errors.
 	target_compile_options(PLAYGROUND PUBLIC "/MP")  # Multicore compilation.
