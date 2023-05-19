@@ -31,10 +31,13 @@ namespace Playground
 		const char * fragmentShaderSource
 			= "#version 450 core\n"
 			  "uniform float u_time;"
+			  "uniform int u_width;"
+			  "uniform int u_height;"
 			  "out vec4 fragColor;\n"
 			  "void main()\n"
 			  "{\n"
-			  "   fragColor = vec4((sin(u_time) / 2.0f) + 0.5f, 0.5f, 0.2f, 1.0f);\n"
+			  "	  vec2 uv = vec2( gl_FragCoord.x / u_width, gl_FragCoord.y / u_height );"
+			  "   fragColor = vec4((sin(u_time) / 2.0f) + 0.5f, 0.5f / uv.x, 0.2f / uv.y, 1.0f);\n"
 			  "}\0";
 		_fs = glCreateShader( GL_FRAGMENT_SHADER );
 		glShaderSource( _fs, 1, &fragmentShaderSource, nullptr );
@@ -55,7 +58,9 @@ namespace Playground
 		glLinkProgram( _program );
 
 		// Uniforms.
-		_uniform = glGetUniformLocation( _program, "u_time" );
+		_uniformTime   = glGetUniformLocation( _program, "u_time" );
+		_uniformWidth  = glGetUniformLocation( _program, "u_width" );
+		_uniformHeight = glGetUniformLocation( _program, "u_height" );
 
 		// VBO.
 		glCreateBuffers( 1, &_vbo );
@@ -90,7 +95,9 @@ namespace Playground
 		glViewport( 0, 0, GLsizei( _width ), GLsizei( _height ) );
 		glClear( GL_COLOR_BUFFER_BIT );
 		glUseProgram( _program );
-		glUniform1f( _uniform, float( p_time ) );
+		glUniform1f( _uniformTime, float( p_time ) );
+		glUniform1i( _uniformWidth, GLint( _width ) );
+		glUniform1i( _uniformHeight, GLint( _height ) );
 		glBindVertexArray( _vao );
 		glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 	}

@@ -24,7 +24,10 @@ namespace Playground
 		unsigned int _vs	  = GL_INVALID_INDEX;
 		unsigned int _fs	  = GL_INVALID_INDEX;
 		unsigned int _program = GL_INVALID_INDEX;
-		unsigned int _uniform = GL_INVALID_INDEX;
+		// TODO: use uniform buffer.
+		unsigned int _uniformTime	= GL_INVALID_INDEX;
+		unsigned int _uniformWidth	= GL_INVALID_INDEX;
+		unsigned int _uniformHeight = GL_INVALID_INDEX;
 
 		static void APIENTRY _debugMessageCallback( const GLenum   p_source,
 													const GLenum   p_type,
