@@ -39,9 +39,9 @@ namespace Playground
 
 			for ( unsigned int i = 0; i < p_framesPerBuffer; i++ )
 			{
-				*out++				  = 0.f;
-				*out++				  = 0.f;
-				in->outputBuffer[ i ] = 0.f;
+				*out++ = 0.f;
+				*out++ = 0.f;
+				// in->outputBuffer[ i ] = 0.f;
 			}
 
 			return paContinue;
@@ -79,10 +79,10 @@ namespace Playground
 				value = f->process( SAMPLE_RATE, value );
 			}
 
-			const float finalOutput = float( in->getVolume() * value );
+			const float finalOutput = float( /*in->getVolume() **/ value );
 			*out++					= finalOutput;
 			*out++					= finalOutput;
-			in->outputBuffer[ i ]	= finalOutput;
+			// in->outputBuffer[ i ]	= finalOutput;
 		}
 
 		for ( Oscillator * const o : in->getOscillators() )
@@ -165,10 +165,7 @@ namespace Playground
 			ImGui::SetNextItemOpen( true );
 			f->draw();
 		}
-
-		ImGui::PlotLines( "", outputBuffer, FRAME_PER_BUFFER, 0, "Output", -1.0f, 1.0f, ImVec2( 600, 150 ) );
-		ImGui::SameLine();
-		ImGuiKnobs::Knob( "Volume", &_volume, 0.f, 1.f, 0.005f, "%.2f", ImGuiKnobVariant_Tick );
+		_amplifier.draw();
 
 		ImGui::End();
 	}

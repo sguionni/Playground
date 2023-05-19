@@ -37,7 +37,7 @@ namespace Playground
 			  "void main()\n"
 			  "{\n"
 			  "	  vec2 uv = vec2( gl_FragCoord.x / u_width, gl_FragCoord.y / u_height );"
-			  "   fragColor = vec4((sin(u_time) / 2.0f) + 0.5f, 0.5f / uv.x, 0.2f / uv.y, 1.0f);\n"
+			  "   fragColor = vec4(sin(u_time * 2.f), cos(u_time * uv.x), uv.y / 2.f, 1.0f);\n"
 			  "}\0";
 		_fs = glCreateShader( GL_FRAGMENT_SHADER );
 		glShaderSource( _fs, 1, &fragmentShaderSource, nullptr );

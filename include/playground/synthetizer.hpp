@@ -1,6 +1,7 @@
 #ifndef __PLAYGROUND_SYNTHETIZER__
 #define __PLAYGROUND_SYNTHETIZER__
 
+#include "amplifier.hpp"
 #include "base_audio_element.hpp"
 #include "filter.hpp"
 #include "input_manager.hpp"
@@ -17,21 +18,17 @@ namespace Playground
 	class Synthetizer : public BaseAudioElement
 	{
 	  public:
-		inline std::string getName() override { return "Synth"; }
-		float			   outputBuffer[ FRAME_PER_BUFFER ];
-		float			   outputFrequencies[ 20000 ];
-
 		Synthetizer( const InputManager & );
 		~Synthetizer();
 
 		inline const InputManager &		   getInputManager() const { return _inputManager; }
 		inline std::vector<Oscillator *> & getOscillators() { return _oscillators; }
 		inline std::vector<Filter *> &	   getFilters() { return _filters; }
-		inline float					   getVolume() const { return _volume; }
 
-		inline void init( const size_t p_rate ) override {}
-		inline void reset() override {}
-		void		draw() override;
+		inline std::string getName() override { return "Synth"; }
+		inline void		   init( const size_t p_rate ) override {}
+		inline void		   reset() override {}
+		void			   draw() override;
 
 	  private:
 		const InputManager & _inputManager;
@@ -39,7 +36,7 @@ namespace Playground
 
 		std::vector<Oscillator *> _oscillators;
 		std::vector<Filter *>	  _filters;
-		float					  _volume = 1.f;
+		Amplifier				  _amplifier = Amplifier();
 	};
 
 } // namespace Playground
