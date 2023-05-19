@@ -18,7 +18,8 @@ namespace Playground
 	{
 	  public:
 		inline std::string getName() override { return "Synth"; }
-		float			   output[ FRAME_PER_BUFFER ];
+		float			   outputBuffer[ FRAME_PER_BUFFER ];
+		float			   outputFrequencies[ 20000 ];
 
 		Synthetizer( const InputManager & );
 		~Synthetizer();
