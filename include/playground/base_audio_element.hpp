@@ -5,6 +5,9 @@
 
 namespace Playground
 {
+	constexpr size_t SAMPLE_RATE	  = 44100;
+	constexpr size_t FRAME_PER_BUFFER = 512;
+
 	class BaseAudioElement
 	{
 	  public:
@@ -13,7 +16,6 @@ namespace Playground
 		inline bool active() const { return _active; }
 
 		inline virtual std::string getName() = 0;
-		inline virtual void		   init( const size_t p_rate, const size_t p_framePerBuffer ) {}
 		inline virtual void		   reset() {}
 		virtual void			   draw() = 0;
 

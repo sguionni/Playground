@@ -47,7 +47,7 @@ namespace Playground
 
 		// Playing.
 		playing							  = true;
-		double buffer[ FRAME_PER_BUFFER ] = { 0 };
+		double buffer[ FRAME_PER_BUFFER ] = { 0.0 };
 		for ( unsigned int i = 0; i < p_framesPerBuffer; i++ )
 		{
 			// Osc.
@@ -73,6 +73,7 @@ namespace Playground
 			}
 		}
 
+		// Amp.
 		in->getAmplifier().amplify( out, buffer, p_framesPerBuffer );
 
 		for ( Oscillator * const o : in->getOscillators() )
@@ -110,17 +111,6 @@ namespace Playground
 
 		// Add filters.
 		//_filters.emplace_back( new FilterLowPass() );
-
-		// Inits.
-		for ( Oscillator * const o : _oscillators )
-		{
-			o->init( SAMPLE_RATE, FRAME_PER_BUFFER );
-		}
-		for ( Filter * const f : _filters )
-		{
-			f->init( SAMPLE_RATE, FRAME_PER_BUFFER );
-		}
-		_amplifier.init( SAMPLE_RATE, FRAME_PER_BUFFER );
 
 		// Start.
 		Pa_StartStream( _stream );
