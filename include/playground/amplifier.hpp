@@ -18,12 +18,16 @@ namespace Playground
 		inline void reset() override { std::fill( _outputBuffer.begin(), _outputBuffer.end(), 0.f ); }
 		void		draw() override;
 
-		inline void amplify( float * const p_out, double * const p_buffer, const size_t p_framesPerBuffer )
+		inline void amplify( float * p_out, double * const p_buffer, const size_t p_framesPerBuffer )
 		{
 			for ( unsigned int i = 0; i < p_framesPerBuffer; ++i )
 			{
-				p_out[ i ]		   = float( p_buffer[ i ] * _volume );
-				_outputBuffer[ i ] = p_out[ i ];
+				const float value = float( p_buffer[ i ] * _volume );
+				// Stereo.
+				*p_out++ = value;
+				*p_out++ = value;
+				// Spectrum.
+				_outputBuffer[ i ] = value;
 			}
 		}
 

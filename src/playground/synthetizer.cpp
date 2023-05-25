@@ -35,41 +35,41 @@ namespace Playground
 				}
 				playing = false;
 			}
-
+			for ( unsigned int i = 0; i < p_framesPerBuffer; i++ )
+			{
+				*out++ = 0.f;
+				*out++ = 0.f;
+			}
 			in->getAmplifier().reset();
 
 			return paContinue;
 		}
 
 		// Playing.
-		playing = true;
-		double buffer[ FRAME_PER_BUFFER ];
+		playing							  = true;
+		double buffer[ FRAME_PER_BUFFER ] = { 0 };
 		for ( unsigned int i = 0; i < p_framesPerBuffer; i++ )
 		{
 			// Osc.
 			for ( Oscillator * const o : in->getOscillators() )
 			{
-				if ( o->active() == false )
+				if ( o->active() )
 				{
-					continue;
-				}
-
-				for ( const auto & note : notes )
-				{
-					// TODO: not the thing to do.
-					buffer[ i ] += o->evaluate( SAMPLE_RATE, i, note.second );
+					for ( const auto & note : notes )
+					{
+						// TODO: not the thing to do.
+						buffer[ i ] += o->evaluate( SAMPLE_RATE, i, note.second );
+					}
 				}
 			}
 
 			// Filters.
 			for ( Filter * const f : in->getFilters() )
 			{
-				if ( f->active() == false )
+				if ( f->active() )
 				{
-					continue;
+					// value = f->filter( SAMPLE_RATE, value[i-1] );
 				}
-
-				// value = f->filter( SAMPLE_RATE, value[i-1] );
 			}
 		}
 
