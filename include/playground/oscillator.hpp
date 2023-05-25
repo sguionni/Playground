@@ -19,16 +19,16 @@ namespace Playground
 		inline void reset() override { _cursor = 0; }
 		void		draw() override;
 
-		inline double evaluate( const size_t p_rate, const unsigned int p_time, const Note & p_note )
+		inline double evaluate( const unsigned int p_time, const Note & p_note )
 		{
-			const double time = ( p_time + _cursor ) / double( p_rate );
+			const double time = ( p_time + _cursor ) / double( SAMPLE_RATE );
 			return _evaluate( _phase, _detune, p_note.apply( _shift ), p_note.apply( _amplitude ), time );
 		}
 
-		inline void move( const size_t p_rate, const int p_cursor )
+		inline void move( const int p_cursor )
 		{
 			_cursor += p_cursor;
-			_cursor %= p_rate;
+			_cursor %= SAMPLE_RATE;
 		}
 
 	  protected:

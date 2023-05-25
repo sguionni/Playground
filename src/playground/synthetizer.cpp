@@ -18,7 +18,7 @@ namespace Playground
 
 		static bool playing = false;
 
-		// TODO: split in functions/class.
+		// TODO: split into functions/class.
 
 		// Stop.
 		if ( notes.empty() )
@@ -58,7 +58,7 @@ namespace Playground
 					for ( const auto & note : notes )
 					{
 						// TODO: not the thing to do.
-						buffer[ i ] += o->evaluate( SAMPLE_RATE, i, note.second );
+						buffer[ i ] += o->evaluate( i, note.second );
 					}
 				}
 			}
@@ -74,13 +74,13 @@ namespace Playground
 		}
 
 		// Amp.
-		in->getAmplifier().amplify( out, buffer, p_framesPerBuffer );
+		in->getAmplifier().amplify( out, buffer );
 
 		for ( Oscillator * const o : in->getOscillators() )
 		{
 			for ( const auto & note : notes )
 			{
-				o->move( SAMPLE_RATE, p_framesPerBuffer );
+				o->move( p_framesPerBuffer );
 			}
 		}
 

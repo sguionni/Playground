@@ -21,64 +21,69 @@ namespace Playground
 		}
 		void draw() override;
 
-		inline void amplify( float * p_out, double * const p_buffer, const size_t p_framesPerBuffer )
+		inline void amplify( float * p_out, double * const p_buffer )
 		{
-			for ( unsigned int i = 0; i < p_framesPerBuffer; ++i )
+			// Write to output.
+			for ( size_t i = 0; i < FRAME_PER_BUFFER; ++i )
 			{
-				const float value = float( p_buffer[ i ] * _volume );
+				const double value	= p_buffer[ i ] * _volume;
+				const float	 fvalue = float( value );
+
 				// Stereo.
-				*p_out++ = value;
-				*p_out++ = value;
+				*p_out++ = fvalue;
+				*p_out++ = fvalue;
 
 				_outputBuffer[ i ] = value;
 			}
 
-			// TEST.
-			_dft( p_buffer, _spectrum, p_framesPerBuffer );
+			// Spectrum.
+			_dft( _outputBuffer, _spectrum );
 
 			double referencePower = 1.0;
 
-			for ( size_t k = 0; k < p_framesPerBuffer; ++k )
+			for ( size_t i = 0; i < FRAME_PER_BUFFER; ++i )
 			{
-				double magnitude		  = std::abs( _spectrum[ k ] );
-				_spectrumMagnitudeDB[ k ] = 10.0 * std::log10( magnitude / referencePower );
+				double magnitude		  = std::abs( _spectrum[ i ] );
+				_spectrumMagnitudeDB[ i ] = 10.0 * std::log10( magnitude / referencePower );
 			}
 
-			for ( size_t k = 0; k < p_framesPerBuffer; ++k )
+			for ( size_t i = 0; i < FRAME_PER_BUFFER; ++i )
 			{
-				// std::cout << "Fréquence " << k << ": " << spectrumMagnitudeDB[ k ] << " dB" << std::endl;
+				// std::cout << "Frequence " << k << ": " << spectrumMagnitudeDB[ k ] << " dB" << std::endl;
 			}
 		}
 
 	  private:
 		float				 _volume = 0.5f;
-		float				 _outputBuffer[ FRAME_PER_BUFFER ];
+		double				 _outputBuffer[ FRAME_PER_BUFFER ];
 		std::complex<double> _spectrum[ FRAME_PER_BUFFER ];
 		double				 _spectrumMagnitudeDB[ FRAME_PER_BUFFER ];
+		double				 _spectrumHzDb[ SAMPLE_RATE ];
 
 		// Hamming.
-		inline void _applyWindow( const double * p_input, double * p_output, size_t p_size )
+		inline void _applyWindow( const double * p_input, double * p_output )
 		{
-			for ( size_t i = 0; i < p_size; ++i )
+			for ( size_t i = 0; i < FRAME_PER_BUFFER; ++i )
 			{
-				p_output[ i ] = p_input[ i ] * ( 0.54 - 0.46 * cos( 2.0 * std::numbers::pi * i / ( p_size - 1 ) ) );
+				p_output[ i ]
+					= p_input[ i ] * ( 0.54 - 0.46 * cos( 2.0 * std::numbers::pi * i / ( FRAME_PER_BUFFER - 1 ) ) );
 			}
 		}
 
 		// DFT.
-		inline void _dft( const double * p_buffer, std::complex<double> * p_spectrum, size_t p_framesPerBuffer )
+		inline void _dft( const double * p_buffer, std::complex<double> * p_spectrum )
 		{
 			double windowedBuffer[ FRAME_PER_BUFFER ];
-			_applyWindow( p_buffer, windowedBuffer, p_framesPerBuffer );
+			_applyWindow( p_buffer, windowedBuffer );
 
-			for ( size_t k = 0; k < p_framesPerBuffer; ++k )
+			for ( size_t i = 0; i < FRAME_PER_BUFFER; ++i )
 			{
-				p_spectrum[ k ] = 0.0;
-				for ( size_t n = 0; n < p_framesPerBuffer; ++n )
+				p_spectrum[ i ] = 0.0;
+				for ( size_t j = 0; j < FRAME_PER_BUFFER; ++j )
 				{
-					double angle = 2.0 * std::numbers::pi * k * n / p_framesPerBuffer;
-					p_spectrum[ k ] += std::complex<double>( windowedBuffer[ n ] * cos( angle ),
-															 -windowedBuffer[ n ] * sin( angle ) );
+					double angle = 2.0 * std::numbers::pi * i * j / FRAME_PER_BUFFER;
+					p_spectrum[ i ] += std::complex<double>( windowedBuffer[ j ] * cos( angle ),
+															 -windowedBuffer[ j ] * sin( angle ) );
 				}
 			}
 		}

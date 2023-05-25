@@ -14,7 +14,7 @@ namespace Playground
 		inline void reset() override { _prevX = _prevY = 0.0; }
 		void		draw() override;
 
-		inline virtual double filter( const size_t p_rate, const double p_value ) = 0;
+		inline virtual double filter( const double p_value ) = 0;
 
 	  protected:
 		int	   _cutoff	  = 1000;
@@ -28,9 +28,9 @@ namespace Playground
 	  public:
 		inline std::string getName() override { return "Low pass"; }
 
-		inline double filter( const size_t p_rate, const double p_value ) override
+		inline double filter( const double p_value ) override
 		{
-			double w0	 = 2.0 * std::numbers::pi * _cutoff / double( p_rate );
+			double w0	 = 2.0 * std::numbers::pi * _cutoff / double( SAMPLE_RATE );
 			double alpha = sin( w0 ) / ( 2.0 * _resonance );
 			double cosw0 = cos( w0 );
 
