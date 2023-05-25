@@ -19,7 +19,6 @@ namespace Playground
 		static bool playing = false;
 
 		// TODO: split in functions/class.
-		// Reset spectrum.
 
 		// Stop.
 		if ( notes.empty() )
@@ -37,22 +36,16 @@ namespace Playground
 				playing = false;
 			}
 
-			for ( unsigned int i = 0; i < p_framesPerBuffer; i++ )
-			{
-				*out++ = 0.f;
-				*out++ = 0.f;
-				// in->outputBuffer[ i ] = 0.f;
-			}
+			in->getAmplifier().reset();
 
 			return paContinue;
 		}
 
 		// Playing.
 		playing = true;
+		double buffer[ FRAME_PER_BUFFER ];
 		for ( unsigned int i = 0; i < p_framesPerBuffer; i++ )
 		{
-			double value = 0;
-
 			// Osc.
 			for ( Oscillator * const o : in->getOscillators() )
 			{
@@ -64,7 +57,7 @@ namespace Playground
 				for ( const auto & note : notes )
 				{
 					// TODO: not the thing to do.
-					value += o->evaluate( SAMPLE_RATE, i, note.second );
+					buffer[ i ] += o->evaluate( SAMPLE_RATE, i, note.second );
 				}
 			}
 
@@ -76,14 +69,11 @@ namespace Playground
 					continue;
 				}
 
-				value = f->process( SAMPLE_RATE, value );
+				// value = f->filter( SAMPLE_RATE, value[i-1] );
 			}
-
-			const float finalOutput = float( /*in->getVolume() **/ value );
-			*out++					= finalOutput;
-			*out++					= finalOutput;
-			// in->outputBuffer[ i ]	= finalOutput;
 		}
+
+		in->getAmplifier().amplify( out, buffer, p_framesPerBuffer );
 
 		for ( Oscillator * const o : in->getOscillators() )
 		{
@@ -124,12 +114,13 @@ namespace Playground
 		// Inits.
 		for ( Oscillator * const o : _oscillators )
 		{
-			o->init( SAMPLE_RATE );
+			o->init( SAMPLE_RATE, FRAME_PER_BUFFER );
 		}
 		for ( Filter * const f : _filters )
 		{
-			f->init( SAMPLE_RATE );
+			f->init( SAMPLE_RATE, FRAME_PER_BUFFER );
 		}
+		_amplifier.init( SAMPLE_RATE, FRAME_PER_BUFFER );
 
 		// Start.
 		Pa_StartStream( _stream );
@@ -165,6 +156,7 @@ namespace Playground
 			ImGui::SetNextItemOpen( true );
 			f->draw();
 		}
+		ImGui::SetNextItemOpen( true );
 		_amplifier.draw();
 
 		ImGui::End();

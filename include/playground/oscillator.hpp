@@ -14,7 +14,7 @@ namespace Playground
 	class Oscillator : public BaseAudioElement
 	{
 	  public:
-		inline void init( const size_t p_rate ) override { _refreshSample(); }
+		inline void init( const size_t, const size_t ) override { _refreshSample(); }
 		inline void reset() override { _cursor = 0; }
 		void		draw() override;
 

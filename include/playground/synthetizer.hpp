@@ -21,13 +21,13 @@ namespace Playground
 		Synthetizer( const InputManager & );
 		~Synthetizer();
 
-		inline const InputManager &		   getInputManager() const { return _inputManager; }
+		inline const InputManager & getInputManager() const { return _inputManager; }
+
 		inline std::vector<Oscillator *> & getOscillators() { return _oscillators; }
 		inline std::vector<Filter *> &	   getFilters() { return _filters; }
+		inline Amplifier &				   getAmplifier() { return _amplifier; }
 
 		inline std::string getName() override { return "Synth"; }
-		inline void		   init( const size_t p_rate ) override {}
-		inline void		   reset() override {}
 		void			   draw() override;
 
 	  private:
@@ -36,7 +36,7 @@ namespace Playground
 
 		std::vector<Oscillator *> _oscillators;
 		std::vector<Filter *>	  _filters;
-		Amplifier				  _amplifier = Amplifier();
+		Amplifier				  _amplifier;
 	};
 
 } // namespace Playground

@@ -12,10 +12,10 @@ namespace Playground
 
 		inline bool active() const { return _active; }
 
-		inline virtual std::string getName()				   = 0;
-		inline virtual void		   init( const size_t p_rate ) = 0;
-		inline virtual void		   reset()					   = 0;
-		virtual void			   draw()					   = 0;
+		inline virtual std::string getName() = 0;
+		inline virtual void		   init( const size_t p_rate, const size_t p_framePerBuffer ) {}
+		inline virtual void		   reset() {}
+		virtual void			   draw() = 0;
 
 	  protected:
 		unsigned int _id	 = 0;
