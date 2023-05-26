@@ -14,8 +14,7 @@ namespace Playground
 	class Oscillator : public BaseAudioElement
 	{
 	  public:
-		Oscillator() { _refreshSample(); }
-
+		inline void init() { _refreshSample(); }
 		inline void reset() override { _cursor = 0; }
 		void		draw() override;
 

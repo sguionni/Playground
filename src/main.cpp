@@ -9,8 +9,8 @@
 #include <imgui/imgui_impl_opengl3.h>
 #include <iostream>
 
-constexpr size_t WIDTH	= 1280;
-constexpr size_t HEIGHT = 800;
+constexpr size_t WIDTH	= 1400;
+constexpr size_t HEIGHT = 1000;
 
 static void glfwErrorCallback( int p_error, const char * p_description )
 {

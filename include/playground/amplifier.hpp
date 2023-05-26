@@ -15,9 +15,10 @@ namespace Playground
 		inline std::string getName() override { return "Amp"; }
 		inline void		   reset() override
 		{
-			std::fill_n( _outputBuffer, FRAME_PER_BUFFER, 0.f );
+			std::fill_n( _outputBuffer, FRAME_PER_BUFFER, 0.0 );
+			std::fill_n( _fOutputBuffer, FRAME_PER_BUFFER, 0.f );
 			std::fill_n( _spectrum, FRAME_PER_BUFFER, 0.0 );
-			std::fill_n( _spectrumMagnitudeDB, FRAME_PER_BUFFER, 0.0 );
+			std::fill_n( _spectrumMagnitudeDB, FRAME_PER_BUFFER, 0.f );
 		}
 		void draw() override;
 
@@ -33,7 +34,8 @@ namespace Playground
 				*p_out++ = fvalue;
 				*p_out++ = fvalue;
 
-				_outputBuffer[ i ] = value;
+				_outputBuffer[ i ]	= value;
+				_fOutputBuffer[ i ] = fvalue;
 			}
 
 			// Spectrum.
@@ -44,7 +46,7 @@ namespace Playground
 			for ( size_t i = 0; i < FRAME_PER_BUFFER; ++i )
 			{
 				double magnitude		  = std::abs( _spectrum[ i ] );
-				_spectrumMagnitudeDB[ i ] = 10.0 * std::log10( magnitude / referencePower );
+				_spectrumMagnitudeDB[ i ] = float( 10.0 * std::log10( magnitude / referencePower ) );
 			}
 
 			for ( size_t i = 0; i < FRAME_PER_BUFFER; ++i )
@@ -55,10 +57,10 @@ namespace Playground
 
 	  private:
 		float				 _volume = 0.5f;
+		float				 _fOutputBuffer[ FRAME_PER_BUFFER ];
 		double				 _outputBuffer[ FRAME_PER_BUFFER ];
 		std::complex<double> _spectrum[ FRAME_PER_BUFFER ];
-		double				 _spectrumMagnitudeDB[ FRAME_PER_BUFFER ];
-		double				 _spectrumHzDb[ SAMPLE_RATE ];
+		float				 _spectrumMagnitudeDB[ FRAME_PER_BUFFER ];
 
 		// Hamming.
 		inline void _applyWindow( const double * p_input, double * p_output )

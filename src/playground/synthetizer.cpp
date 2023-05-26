@@ -112,6 +112,11 @@ namespace Playground
 		// Add filters.
 		//_filters.emplace_back( new FilterLowPass() );
 
+		for ( Oscillator * const o : _oscillators )
+		{
+			o->init();
+		}
+
 		// Start.
 		Pa_StartStream( _stream );
 	}

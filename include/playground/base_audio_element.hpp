@@ -6,7 +6,7 @@
 namespace Playground
 {
 	constexpr size_t SAMPLE_RATE	  = 44100;
-	constexpr size_t FRAME_PER_BUFFER = 512;
+	constexpr size_t FRAME_PER_BUFFER = 256;
 
 	class BaseAudioElement
 	{
