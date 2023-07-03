@@ -28,7 +28,6 @@ namespace Playground
 		inline std::map<unsigned char, Note> getNotes() const { return _notes; }
 
 		void handle( const SDL_Event & p_event );
-		void update();
 
 	  private:
 		libremidi::midi_in			  _midi;

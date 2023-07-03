@@ -54,7 +54,6 @@ int main( int, char ** )
 			{
 				inputManager.handle( event );
 			}
-			inputManager.update();
 		}
 	}
 	catch ( const std::exception & p_e )
