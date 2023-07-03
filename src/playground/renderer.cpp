@@ -4,8 +4,15 @@
 namespace Playground
 {
 
-	Renderer::Renderer( const size_t p_width, const size_t p_height ) : _width( p_width ), _height( p_height )
+	Renderer::Renderer( void * p_proc, const size_t p_width, const size_t p_height ) :
+		_width( p_width ), _height( p_height )
 	{
+		// Load OpenGL.
+		if ( gladLoadGLLoader( (GLADloadproc)p_proc ) == 0 )
+		{
+			throw std::runtime_error( "Failed to initialize GLAD" );
+		}
+
 		// Debug infos.
 		glEnable( GL_DEBUG_OUTPUT );
 		glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );

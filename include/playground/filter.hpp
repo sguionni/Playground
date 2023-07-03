@@ -26,7 +26,7 @@ namespace Playground
 	class FilterLowPass : public Filter
 	{
 	  public:
-		inline std::string getName() override { return "Low pass"; }
+		inline std::string getName() const override { return "Low pass"; }
 
 		inline double filter( const double p_value ) override
 		{

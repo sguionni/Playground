@@ -15,7 +15,7 @@ namespace Playground
 
 		inline bool active() const { return _active; }
 
-		inline virtual std::string getName() = 0;
+		inline virtual std::string getName() const = 0;
 		inline virtual void		   reset() {}
 		virtual void			   draw() = 0;
 

@@ -25,11 +25,11 @@ namespace Playground
 		{
 			if ( playing )
 			{
-				for ( Oscillator * const o : in->getOscillators() )
+				for ( auto & o : in->getOscillators() )
 				{
 					o->reset();
 				}
-				for ( Filter * const f : in->getFilters() )
+				for ( auto & f : in->getFilters() )
 				{
 					f->reset();
 				}
@@ -51,7 +51,7 @@ namespace Playground
 		for ( unsigned int i = 0; i < p_framesPerBuffer; i++ )
 		{
 			// Osc.
-			for ( Oscillator * const o : in->getOscillators() )
+			for ( auto & o : in->getOscillators() )
 			{
 				if ( o->active() )
 				{
@@ -64,7 +64,7 @@ namespace Playground
 			}
 
 			// Filters.
-			for ( Filter * const f : in->getFilters() )
+			for ( auto & f : in->getFilters() )
 			{
 				if ( f->active() )
 				{
@@ -76,7 +76,7 @@ namespace Playground
 		// Amp.
 		in->getAmplifier().amplify( out, buffer );
 
-		for ( Oscillator * const o : in->getOscillators() )
+		for ( auto & o : in->getOscillators() )
 		{
 			for ( const auto & note : notes )
 			{
@@ -112,7 +112,7 @@ namespace Playground
 		// Add filters.
 		//_filters.emplace_back( new FilterLowPass() );
 
-		for ( Oscillator * const o : _oscillators )
+		for ( auto & o : _oscillators )
 		{
 			o->init();
 		}
@@ -127,26 +127,17 @@ namespace Playground
 		Pa_StopStream( _stream );
 		Pa_CloseStream( _stream );
 		Pa_Terminate();
-
-		for ( Oscillator * const o : _oscillators )
-		{
-			delete o;
-		}
-		for ( Filter * const f : _filters )
-		{
-			delete f;
-		}
 	}
 
 	void Synthetizer::draw()
 	{
 		ImGui::Begin( getName().c_str() );
-		for ( Oscillator * const o : _oscillators )
+		for ( auto & o : _oscillators )
 		{
 			ImGui::SetNextItemOpen( true );
 			o->draw();
 		}
-		for ( Filter * const f : _filters )
+		for ( auto & f : _filters )
 		{
 			ImGui::SetNextItemOpen( true );
 			f->draw();

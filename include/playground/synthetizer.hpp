@@ -19,22 +19,21 @@ namespace Playground
 		Synthetizer( const InputManager & );
 		~Synthetizer();
 
-		inline const InputManager & getInputManager() const { return _inputManager; }
+		inline const InputManager &						  getInputManager() const { return _inputManager; }
+		inline std::vector<std::unique_ptr<Oscillator>> & getOscillators() { return _oscillators; }
+		inline std::vector<std::unique_ptr<Filter>> &	  getFilters() { return _filters; }
+		inline Amplifier &								  getAmplifier() { return _amplifier; }
 
-		inline std::vector<Oscillator *> & getOscillators() { return _oscillators; }
-		inline std::vector<Filter *> &	   getFilters() { return _filters; }
-		inline Amplifier &				   getAmplifier() { return _amplifier; }
-
-		inline std::string getName() override { return "Synth"; }
+		inline std::string getName() const override { return "Synth"; }
 		void			   draw() override;
 
 	  private:
-		const InputManager & _inputManager;
 		PaStream *			 _stream;
+		const InputManager & _inputManager;
 
-		std::vector<Oscillator *> _oscillators;
-		std::vector<Filter *>	  _filters;
-		Amplifier				  _amplifier;
+		std::vector<std::unique_ptr<Oscillator>> _oscillators;
+		std::vector<std::unique_ptr<Filter>>	 _filters;
+		Amplifier								 _amplifier;
 	};
 
 } // namespace Playground

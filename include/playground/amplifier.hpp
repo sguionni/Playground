@@ -12,7 +12,7 @@ namespace Playground
 	class Amplifier : public BaseAudioElement
 	{
 	  public:
-		inline std::string getName() override { return "Amp"; }
+		inline std::string getName() const override { return "Amp"; }
 		inline void		   reset() override
 		{
 			std::fill_n( _outputBuffer, FRAME_PER_BUFFER, 0.0 );

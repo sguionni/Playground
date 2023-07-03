@@ -44,4 +44,42 @@ namespace Playground
 
 	InputManager::~InputManager() { _midi.close_port(); }
 
+	void InputManager::handle( const SDL_Event & p_event )
+	{
+		switch ( p_event.type )
+		{
+		case SDL_QUIT: _onClose(); break;
+		case SDL_KEYDOWN: _keys[ p_event.key.keysym.scancode ] = true; break;
+		case SDL_KEYUP: _keys[ p_event.key.keysym.scancode ] = false; break;
+		case SDL_MOUSEBUTTONDOWN: _mouseButtons[ p_event.button.button - 1 ] = true; break;
+		case SDL_MOUSEBUTTONUP: _mouseButtons[ p_event.button.button - 1 ] = false; break;
+		case SDL_MOUSEMOTION:
+			if ( _mouseButtons[ 2 ] )
+			{
+				_deltaMouse.x += p_event.motion.xrel;
+				_deltaMouse.y += p_event.motion.yrel;
+			}
+			break;
+		case SDL_MOUSEWHEEL: _deltaWheel += p_event.wheel.y; break;
+		case SDL_WINDOWEVENT:
+			switch ( p_event.window.event )
+			{
+			case SDL_WINDOWEVENT_RESIZED: _onResize( p_event.window.data1, p_event.window.data2 ); break;
+			}
+			break;
+		default: break;
+		}
+	}
+
+	void InputManager::update()
+	{
+		// Handle notes.
+
+		// Exit.
+		if ( _keys[ SDL_SCANCODE_ESCAPE ] )
+		{
+			_onClose();
+		}
+	}
+
 } // namespace Playground

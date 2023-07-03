@@ -59,7 +59,7 @@ namespace Playground
 	class OscillatorSin : public Oscillator
 	{
 	  public:
-		inline std::string getName() override { return "Sin"; }
+		inline std::string getName() const override { return "Sin"; }
 
 	  private:
 		inline double _evaluate( const float  p_phase,
@@ -77,7 +77,7 @@ namespace Playground
 	class OscillatorSaw : public Oscillator
 	{
 	  public:
-		inline std::string getName() override { return "Saw"; }
+		inline std::string getName() const override { return "Saw"; }
 
 	  private:
 		inline double _evaluate( const float  p_phase,
@@ -94,7 +94,7 @@ namespace Playground
 	class OscillatorSquare : public Oscillator
 	{
 	  public:
-		inline std::string getName() override { return "Square"; }
+		inline std::string getName() const override { return "Square"; }
 
 	  private:
 		inline double _evaluate( const float  p_phase,
@@ -113,7 +113,7 @@ namespace Playground
 	class OscillatorTriangle : public Oscillator
 	{
 	  public:
-		inline std::string getName() override { return "Triangle"; }
+		inline std::string getName() const override { return "Triangle"; }
 
 	  private:
 		inline double _evaluate( const float  p_phase,

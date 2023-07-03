@@ -1,110 +1,67 @@
-#include <glad/glad.h>
-#define GLFW_INCLUDE_NONE
 #include "playground/input_manager.hpp"
 #include "playground/renderer.hpp"
 #include "playground/synthetizer.hpp"
-#include <GLFW/glfw3.h>
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
+#include "playground/user_interface.hpp"
 #include <iostream>
+
+#ifdef _WIN32
+extern "C"
+{
+	__declspec( dllexport ) uint32_t NvOptimusEnablement			 = 0x00000001;
+	__declspec( dllexport ) int AmdPowerXpressRequestHighPerformance = 1;
+}
+#endif
 
 constexpr size_t WIDTH	= 1400;
 constexpr size_t HEIGHT = 1000;
-
-static void glfwErrorCallback( int p_error, const char * p_description )
-{
-	std::cout << "GLFW Error: " << p_error << ": " << p_description << std::endl;
-}
 
 int main( int, char ** )
 {
 	using namespace Playground;
 
-	// Init glfw window.
-	glfwSetErrorCallback( glfwErrorCallback );
-	if ( glfwInit() == 0 )
-	{
-		return EXIT_FAILURE;
-	}
-
-	const char * glslVersion = "#version 450 core";
-	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 5 );
-	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-
-	GLFWwindow * const window = glfwCreateWindow( WIDTH, HEIGHT, "Playground", nullptr, nullptr );
-	if ( window == nullptr )
-	{
-		glfwTerminate();
-		return EXIT_FAILURE;
-	}
-
-	glfwMakeContextCurrent( window );
-	glfwSwapInterval( 1 );
-
-	// Init glad.
-	if ( gladLoadGLLoader( (GLADloadproc)glfwGetProcAddress ) == 0 )
-	{
-		glfwTerminate();
-		return EXIT_FAILURE;
-	}
-
-	// Init ImGui.
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplGlfw_InitForOpenGL( window, true );
-	ImGui_ImplOpenGL3_Init( glslVersion );
-
-	// Init playground.
-	int code = EXIT_SUCCESS;
+	bool isRunning = true;
 	try
 	{
-		const InputManager	   inputManager;
-		Synthetizer			   synthetizer( inputManager );
-		static Renderer		   renderer( WIDTH, HEIGHT );
-		GLFWframebuffersizefun resizeFunction
-			= []( GLFWwindow * p_window, int p_width, int p_height ) { renderer.resize( p_width, p_height ); };
-		glfwSetFramebufferSizeCallback( window, resizeFunction );
+		// UI.
+		UserInterface ui( WIDTH, HEIGHT );
+
+		// Renderer.
+		Renderer renderer( ui.getProcAddress(), WIDTH, HEIGHT );
+
+		// Input manager.
+		InputManager inputManager;
+		inputManager.setCallbackClose( [ &isRunning ]() { isRunning = false; } );
+		inputManager.setCallbackResize( [ &renderer ]( const size_t p_width, const size_t p_height )
+										{ renderer.resize( p_width, p_height ); } );
+
+		// Synth.
+		Synthetizer synthetizer( inputManager );
+
 		// Main loop.
-		while ( glfwWindowShouldClose( window ) == false )
+		while ( isRunning )
 		{
-			glfwPollEvents();
+			float time = float( ui.getTime() ) * 1e-3f;
 
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui_ImplGlfw_NewFrame();
-			ImGui::NewFrame();
+			// Renderer.
+			renderer.render( time );
 
-			synthetizer.draw();
+			// UI.
+			ui.draw( synthetizer );
 
-			ImGui::Render();
-			// int width, height;
-			// glfwGetFramebufferSize( window, &width, &height );
-
-			renderer.render( glfwGetTime() );
-			glfwSetWindowTitle(
-				window,
-				( std::string( "Playground " ) + std::to_string( int( ImGui::GetIO().Framerate ) ) + "FPS" ).c_str() );
-			ImGui::GetIO().Framerate;
-			ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
-
-			glfwSwapBuffers( window );
+			// Events.
+			SDL_Event event;
+			while ( ui.getEvent( event ) )
+			{
+				inputManager.handle( event );
+			}
+			inputManager.update();
 		}
 	}
 	catch ( const std::exception & p_e )
 	{
 		std::cout << p_e.what() << std::endl;
-		code = EXIT_FAILURE;
+		return EXIT_FAILURE;
 	}
 
-	// Clean.
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
-
-	glfwDestroyWindow( window );
-	glfwTerminate();
-
-	return code;
+	return EXIT_SUCCESS;
 }

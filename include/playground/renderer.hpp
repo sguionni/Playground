@@ -9,7 +9,7 @@ namespace Playground
 	class Renderer
 	{
 	  public:
-		Renderer( const size_t p_width, const size_t p_height );
+		Renderer( void * p_proc, const size_t p_width, const size_t p_height );
 		~Renderer();
 
 		void resize( const size_t p_width, const size_t p_height );
