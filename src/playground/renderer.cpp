@@ -1,4 +1,5 @@
 #include "playground/renderer.hpp"
+#include <fstream>
 #include <iostream>
 
 namespace Playground
@@ -23,31 +24,20 @@ namespace Playground
 		float vertices[] = { -1.f, 1.f, -1.f, -1.f, 1.f, 1.f, 1.f, -1.f };
 
 		// Default VS.
-		const char * vertexShaderSource
-			= "#version 450 core\n"
-			  "layout (location = 0) in vec3 aPos;\n"
-			  "void main()\n"
-			  "{\n"
-			  "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-			  "}\0";
-		_vs = glCreateShader( GL_VERTEX_SHADER );
-		glShaderSource( _vs, 1, &vertexShaderSource, nullptr );
+		const auto		  rootPath			 = std::filesystem::current_path() / "shaders";
+		auto			  filePath			 = rootPath / "shader.vert";
+		const std::string vertexShaderSource = readShader( filePath );
+		const GLchar *	  vertexShaderCode	 = vertexShaderSource.c_str();
+		_vs									 = glCreateShader( GL_VERTEX_SHADER );
+		glShaderSource( _vs, 1, &vertexShaderCode, nullptr );
 		glCompileShader( _vs );
 
 		// FS.
-		const char * fragmentShaderSource
-			= "#version 450 core\n"
-			  "uniform float u_time;"
-			  "uniform int u_width;"
-			  "uniform int u_height;"
-			  "out vec4 fragColor;\n"
-			  "void main()\n"
-			  "{\n"
-			  "	  vec2 uv = vec2( gl_FragCoord.x / u_width, gl_FragCoord.y / u_height );"
-			  "   fragColor = vec4(sin(u_time * 2.f), cos(u_time * uv.x), uv.y / 2.f, 1.0f);\n"
-			  "}\0";
-		_fs = glCreateShader( GL_FRAGMENT_SHADER );
-		glShaderSource( _fs, 1, &fragmentShaderSource, nullptr );
+		filePath							   = rootPath / "shader.frag";
+		const std::string fragmentShaderSource = readShader( filePath );
+		const GLchar *	  fragmentShaderCode   = fragmentShaderSource.c_str();
+		_fs									   = glCreateShader( GL_FRAGMENT_SHADER );
+		glShaderSource( _fs, 1, &fragmentShaderCode, nullptr );
 		glCompileShader( _fs );
 		int	 success;
 		char infoLog[ 512 ];
@@ -107,6 +97,22 @@ namespace Playground
 		glUniform1i( _uniformHeight, GLint( _height ) );
 		glBindVertexArray( _vao );
 		glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+	}
+
+	std::string Renderer::readShader( const std::filesystem::path & p_filePath )
+	{
+		std::ifstream inputFile( p_filePath );
+
+		if ( inputFile.is_open() )
+		{
+			std::string fileContent( ( std::istreambuf_iterator<char>( inputFile ) ),
+									 std::istreambuf_iterator<char>() );
+			return fileContent;
+		}
+		else
+		{
+			throw std::runtime_error( "Can not read " + p_filePath.string() );
+		}
 	}
 
 	void APIENTRY Renderer::_debugMessageCallback( const GLenum	  p_source,

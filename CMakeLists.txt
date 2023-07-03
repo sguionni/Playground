@@ -32,6 +32,11 @@ add_custom_command(TARGET PLAYGROUND POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:PLAYGROUND> $<TARGET_RUNTIME_DLLS:PLAYGROUND>
   COMMAND_EXPAND_LISTS
 )
+
+# Copy shaders.
+add_custom_target(PLAYGROUND_COPY_SHADERS ALL COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/src/playground/shaders $<TARGET_FILE_DIR:PLAYGROUND>/shaders)
+add_dependencies(PLAYGROUND PLAYGROUND_COPY_SHADERS)
+
 # Compile options.
 target_compile_features(PLAYGROUND PUBLIC cxx_std_20)
 

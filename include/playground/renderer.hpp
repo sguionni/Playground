@@ -2,7 +2,9 @@
 #define __PLAYGROUND_RENDERER__
 
 #include <cstddef>
+#include <filesystem>
 #include <glad/glad.h>
+#include <string>
 
 namespace Playground
 {
@@ -28,6 +30,8 @@ namespace Playground
 		unsigned int _uniformTime	= GL_INVALID_INDEX;
 		unsigned int _uniformWidth	= GL_INVALID_INDEX;
 		unsigned int _uniformHeight = GL_INVALID_INDEX;
+
+		static std::string readShader( const std::filesystem::path & );
 
 		static void APIENTRY _debugMessageCallback( const GLenum   p_source,
 													const GLenum   p_type,
