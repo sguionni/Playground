@@ -13,8 +13,9 @@ namespace Playground
 	class InputManager
 	{
 	  public:
-		using CallbackClose	 = std::function<void()>;
-		using CallbackResize = std::function<void( const size_t, const size_t )>;
+		using CallbackClose		 = std::function<void()>;
+		using CallbackResize	 = std::function<void( const size_t, const size_t )>;
+		using CallbackKeyPressed = std::function<void()>;
 
 		InputManager();
 		~InputManager();
@@ -29,6 +30,11 @@ namespace Playground
 
 		void handle( const SDL_Event & p_event );
 
+		inline void listenKeyPressed( const SDL_Scancode p_code, const CallbackKeyPressed & p_cb )
+		{
+			_callbacksKeyPressed[ p_code ] = p_cb;
+		}
+
 	  private:
 		libremidi::midi_in			  _midi;
 		std::map<unsigned char, Note> _notes;
@@ -38,8 +44,9 @@ namespace Playground
 		glm::ivec2 _deltaMouse = { 0, 0 };
 		int		   _deltaWheel = 0;
 
-		CallbackClose  _callbackClose;
-		CallbackResize _callbackResize;
+		CallbackClose							   _callbackClose;
+		CallbackResize							   _callbackResize;
+		std::map<SDL_Scancode, CallbackKeyPressed> _callbacksKeyPressed;
 
 		inline void _onClose()
 		{

@@ -33,6 +33,8 @@ int main( int, char ** )
 		inputManager.setCallbackClose( [ &isRunning ]() { isRunning = false; } );
 		inputManager.setCallbackResize( [ &renderer ]( const size_t p_width, const size_t p_height )
 										{ renderer.resize( p_width, p_height ); } );
+		inputManager.listenKeyPressed( SDL_SCANCODE_F8, [ &renderer ]() { renderer.compileShaders(); } );
+		inputManager.listenKeyPressed( SDL_SCANCODE_ESCAPE, [ &isRunning ]() { isRunning = false; } );
 
 		// Synth.
 		Synthetizer synthetizer( inputManager );

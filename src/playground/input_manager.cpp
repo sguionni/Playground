@@ -62,7 +62,11 @@ namespace Playground
 		case SDL_QUIT: _onClose(); break;
 		case SDL_KEYDOWN:
 			_keys[ p_event.key.keysym.scancode ] = true;
-			note								 = p_event.key.keysym.scancode - SDL_SCANCODE_A;
+			if ( _callbacksKeyPressed.contains( p_event.key.keysym.scancode ) )
+			{
+				_callbacksKeyPressed[ p_event.key.keysym.scancode ]();
+			}
+			note = p_event.key.keysym.scancode - SDL_SCANCODE_A;
 			_notes.emplace( note, Note( note, 100 ) );
 			break;
 		case SDL_KEYUP:

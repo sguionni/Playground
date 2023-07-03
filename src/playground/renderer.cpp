@@ -23,42 +23,8 @@ namespace Playground
 		//{ Vec2f( -1.f, 1.f ), Vec2f( -1.f, -1.f ), Vec2f( 1.f, 1.f ), Vec2f( 1.f, -1.f ) };
 		float vertices[] = { -1.f, 1.f, -1.f, -1.f, 1.f, 1.f, 1.f, -1.f };
 
-		// Default VS.
-		const auto		  rootPath			 = std::filesystem::current_path() / "shaders";
-		auto			  filePath			 = rootPath / "shader.vert";
-		const std::string vertexShaderSource = readShader( filePath );
-		const GLchar *	  vertexShaderCode	 = vertexShaderSource.c_str();
-		_vs									 = glCreateShader( GL_VERTEX_SHADER );
-		glShaderSource( _vs, 1, &vertexShaderCode, nullptr );
-		glCompileShader( _vs );
-
-		// FS.
-		filePath							   = rootPath / "shader.frag";
-		const std::string fragmentShaderSource = readShader( filePath );
-		const GLchar *	  fragmentShaderCode   = fragmentShaderSource.c_str();
-		_fs									   = glCreateShader( GL_FRAGMENT_SHADER );
-		glShaderSource( _fs, 1, &fragmentShaderCode, nullptr );
-		glCompileShader( _fs );
-		int	 success;
-		char infoLog[ 512 ];
-		glGetShaderiv( _fs, GL_COMPILE_STATUS, &success );
-		if ( !success )
-		{
-			glGetShaderInfoLog( _fs, 512, nullptr, infoLog );
-			std::cout << "SHADER COMPILATION FAILED\n" << infoLog << std::endl;
-		}
-
-		// Program.
-		_program = glCreateProgram();
-		glAttachShader( _program, _vs );
-		glAttachShader( _program, _fs );
-		glLinkProgram( _program );
-
-		// Uniforms.
-		_uniformTime   = glGetUniformLocation( _program, "u_time" );
-		_uniformOutput = glGetUniformLocation( _program, "u_output" );
-		_uniformWidth  = glGetUniformLocation( _program, "u_width" );
-		_uniformHeight = glGetUniformLocation( _program, "u_height" );
+		// Shaders.
+		compileShaders();
 
 		// VBO.
 		glCreateBuffers( 1, &_vbo );
@@ -99,6 +65,60 @@ namespace Playground
 		glUniform1i( _uniformHeight, GLint( _height ) );
 		glBindVertexArray( _vao );
 		glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+	}
+
+	void Renderer::compileShaders()
+	{
+		// Detach shaders.
+		if ( glIsProgram( _program ) )
+		{
+			GLint nbShaders = 0;
+			glGetProgramiv( _program, GL_ATTACHED_SHADERS, &nbShaders );
+			std::vector<GLuint> shaders( nbShaders );
+			glGetAttachedShaders( _program, nbShaders, nullptr, shaders.data() );
+			for ( GLuint shader : shaders )
+			{
+				glDetachShader( _program, shader );
+				glDeleteShader( shader );
+			}
+		}
+
+		// Default VS.
+		const auto		  rootPath			 = std::filesystem::current_path() / "shaders";
+		auto			  filePath			 = rootPath / "shader.vert";
+		const std::string vertexShaderSource = readShader( filePath );
+		const GLchar *	  vertexShaderCode	 = vertexShaderSource.c_str();
+		_vs									 = glCreateShader( GL_VERTEX_SHADER );
+		glShaderSource( _vs, 1, &vertexShaderCode, nullptr );
+		glCompileShader( _vs );
+
+		// FS.
+		filePath							   = rootPath / "shader.frag";
+		const std::string fragmentShaderSource = readShader( filePath );
+		const GLchar *	  fragmentShaderCode   = fragmentShaderSource.c_str();
+		_fs									   = glCreateShader( GL_FRAGMENT_SHADER );
+		glShaderSource( _fs, 1, &fragmentShaderCode, nullptr );
+		glCompileShader( _fs );
+		int	 success;
+		char infoLog[ 512 ];
+		glGetShaderiv( _fs, GL_COMPILE_STATUS, &success );
+		if ( !success )
+		{
+			glGetShaderInfoLog( _fs, 512, nullptr, infoLog );
+			std::cout << "SHADER COMPILATION FAILED\n" << infoLog << std::endl;
+		}
+
+		// Program.
+		_program = glCreateProgram();
+		glAttachShader( _program, _vs );
+		glAttachShader( _program, _fs );
+		glLinkProgram( _program );
+
+		// Uniforms.
+		_uniformTime   = glGetUniformLocation( _program, "u_time" );
+		_uniformOutput = glGetUniformLocation( _program, "u_output" );
+		_uniformWidth  = glGetUniformLocation( _program, "u_width" );
+		_uniformHeight = glGetUniformLocation( _program, "u_height" );
 	}
 
 	std::string Renderer::readShader( const std::filesystem::path & p_filePath )

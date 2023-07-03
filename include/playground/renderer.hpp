@@ -16,6 +16,7 @@ namespace Playground
 
 		void resize( const size_t p_width, const size_t p_height );
 		void render( const float p_time, const float * p_output );
+		void compileShaders();
 
 	  private:
 		size_t _width;
