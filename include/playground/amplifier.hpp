@@ -12,11 +12,12 @@ namespace Playground
 	class Amplifier : public BaseAudioElement
 	{
 	  public:
+		inline float *	   getOutputBufferFloat() { return _outputBufferFloat; }
 		inline std::string getName() const override { return "Amp"; }
 		inline void		   reset() override
 		{
 			std::fill_n( _outputBuffer, FRAME_PER_BUFFER, 0.0 );
-			std::fill_n( _fOutputBuffer, FRAME_PER_BUFFER, 0.f );
+			std::fill_n( _outputBufferFloat, FRAME_PER_BUFFER, 0.f );
 			std::fill_n( _spectrum, FRAME_PER_BUFFER, 0.0 );
 			std::fill_n( _spectrumMagnitudeDB, FRAME_PER_BUFFER, 0.f );
 		}
@@ -34,8 +35,8 @@ namespace Playground
 				*p_out++ = fvalue;
 				*p_out++ = fvalue;
 
-				_outputBuffer[ i ]	= value;
-				_fOutputBuffer[ i ] = fvalue;
+				_outputBuffer[ i ]		= value;
+				_outputBufferFloat[ i ] = fvalue;
 			}
 
 			// Spectrum.
@@ -57,7 +58,7 @@ namespace Playground
 
 	  private:
 		float				 _volume = 0.5f;
-		float				 _fOutputBuffer[ FRAME_PER_BUFFER ];
+		float				 _outputBufferFloat[ FRAME_PER_BUFFER ];
 		double				 _outputBuffer[ FRAME_PER_BUFFER ];
 		std::complex<double> _spectrum[ FRAME_PER_BUFFER ];
 		float				 _spectrumMagnitudeDB[ FRAME_PER_BUFFER ];

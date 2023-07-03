@@ -15,7 +15,7 @@ namespace Playground
 		~Renderer();
 
 		void resize( const size_t p_width, const size_t p_height );
-		void render( const double p_time );
+		void render( const float p_time, const float * p_output );
 
 	  private:
 		size_t _width;
@@ -28,6 +28,7 @@ namespace Playground
 		unsigned int _program = GL_INVALID_INDEX;
 		// TODO: use uniform buffer.
 		unsigned int _uniformTime	= GL_INVALID_INDEX;
+		unsigned int _uniformOutput = GL_INVALID_INDEX;
 		unsigned int _uniformWidth	= GL_INVALID_INDEX;
 		unsigned int _uniformHeight = GL_INVALID_INDEX;
 

@@ -43,7 +43,7 @@ int main( int, char ** )
 			float time = float( ui.getTime() ) * 1e-3f;
 
 			// Renderer.
-			renderer.render( time );
+			renderer.render( time, synthetizer.getAmplifier().getOutputBufferFloat() );
 
 			// UI.
 			ui.draw( synthetizer );

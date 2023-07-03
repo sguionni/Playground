@@ -56,6 +56,7 @@ namespace Playground
 
 		// Uniforms.
 		_uniformTime   = glGetUniformLocation( _program, "u_time" );
+		_uniformOutput = glGetUniformLocation( _program, "u_output" );
 		_uniformWidth  = glGetUniformLocation( _program, "u_width" );
 		_uniformHeight = glGetUniformLocation( _program, "u_height" );
 
@@ -87,12 +88,13 @@ namespace Playground
 		_height = p_height;
 	}
 
-	void Renderer::render( const double p_time )
+	void Renderer::render( const float p_time, const float * p_output )
 	{
 		glViewport( 0, 0, GLsizei( _width ), GLsizei( _height ) );
 		glClear( GL_COLOR_BUFFER_BIT );
 		glUseProgram( _program );
 		glUniform1f( _uniformTime, float( p_time ) );
+		glUniform1fv( _uniformOutput, 256, p_output );
 		glUniform1i( _uniformWidth, GLint( _width ) );
 		glUniform1i( _uniformHeight, GLint( _height ) );
 		glBindVertexArray( _vao );
