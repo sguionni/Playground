@@ -21,7 +21,6 @@ namespace Playground
 			std::fill_n( _spectrum, FRAME_PER_BUFFER, 0.0 );
 			std::fill_n( _spectrumMagnitudeDB, FRAME_PER_BUFFER, 0.f );
 		}
-		void draw() override;
 
 		inline void amplify( float * p_out, double * const p_buffer )
 		{
@@ -62,6 +61,8 @@ namespace Playground
 		double				 _outputBuffer[ FRAME_PER_BUFFER ];
 		std::complex<double> _spectrum[ FRAME_PER_BUFFER ];
 		float				 _spectrumMagnitudeDB[ FRAME_PER_BUFFER ];
+
+		void _draw() override;
 
 		// Hamming.
 		inline void _applyWindow( const double * p_input, double * p_output )

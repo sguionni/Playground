@@ -1,6 +1,7 @@
 #include "playground/renderer.hpp"
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 namespace Playground
 {

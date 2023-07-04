@@ -4,9 +4,9 @@
 
 namespace Playground
 {
-	void Oscillator::draw()
+	void Oscillator::_draw()
 	{
-		if ( ImGui::TreeNode( ( std::to_string( _id ) + " - " + getName() ).c_str() ) )
+		if ( _isOpen = ImGui::CollapsingHeader( getName().c_str() ), &_closable, ImGuiTreeNodeFlags_DefaultOpen )
 		{
 			if ( ImGuiKnobs::KnobInt( "Shift", &_shift, -440, 440, 1, "%dhz", ImGuiKnobVariant_Tick ) )
 			{
@@ -33,8 +33,15 @@ namespace Playground
 			ImGui::PlotLines( "", _sample, SAMPLE_SIZE, 0, "", -1.0f, 1.0f, ImVec2( 400, 100 ) );
 			ImGui::SameLine();
 			ImGui::Checkbox( "Active", &_active );
+			if ( ImGui::Button( "X" ) )
+			{
+				_delete();
+			}
+		}
 
-			ImGui::TreePop();
+		if ( _closable )
+		{
+			//_delete();
 		}
 	}
 } // namespace Playground

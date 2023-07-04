@@ -4,9 +4,9 @@
 
 namespace Playground
 {
-	void Amplifier::draw()
+	void Amplifier::_draw()
 	{
-		if ( ImGui::TreeNode( ( std::to_string( _id ) + " - " + getName() ).c_str() ) )
+		if ( ImGui::TreeNode( getName().c_str() ) )
 		{
 			ImGui::PlotLines( "", _outputBufferFloat, FRAME_PER_BUFFER, 0, "Output", -1.f, 1.f, ImVec2( 600, 150 ) );
 			ImGui::SameLine();

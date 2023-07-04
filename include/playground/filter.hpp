@@ -12,7 +12,6 @@ namespace Playground
 	{
 	  public:
 		inline void reset() override { _prevX = _prevY = 0.0; }
-		void		draw() override;
 
 		inline virtual double filter( const double p_value ) = 0;
 
@@ -21,6 +20,9 @@ namespace Playground
 		float  _resonance = 0.f;
 		double _prevX	  = 0.0;
 		double _prevY	  = 0.0;
+
+	  private:
+		void _draw() override;
 	};
 
 	class FilterLowPass : public Filter

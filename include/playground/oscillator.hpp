@@ -15,8 +15,7 @@ namespace Playground
 	{
 	  public:
 		inline void init() { _refreshSample(); }
-		inline void reset() override { _cursor = 0; }
-		void		draw() override;
+		inline void reset() override { _cursor = 0; };
 
 		inline double evaluate( const unsigned int p_time, const Note & p_note )
 		{
@@ -54,6 +53,11 @@ namespace Playground
 										 const float  p_amp,
 										 const double p_time ) const
 			= 0;
+
+	  private:
+		bool _closable = false;
+
+		void _draw() override;
 	};
 
 	class OscillatorSin : public Oscillator

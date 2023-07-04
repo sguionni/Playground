@@ -4,9 +4,9 @@
 
 namespace Playground
 {
-	void Filter::draw()
+	void Filter::_draw()
 	{
-		if ( ImGui::TreeNode( ( std::to_string( _id ) + " - " + getName() ).c_str() ) )
+		if ( ImGui::TreeNode( getName().c_str() ) )
 		{
 			if ( ImGuiKnobs::KnobInt( "Cutoff", &_cutoff, 100, 2000, 1, "%dhz", ImGuiKnobVariant_Tick ) ) {}
 			ImGui::SameLine();

@@ -27,7 +27,7 @@ namespace Playground
 			{
 				for ( auto & o : in->getOscillators() )
 				{
-					o->reset();
+					o.second->reset();
 				}
 				for ( auto & f : in->getFilters() )
 				{
@@ -53,12 +53,12 @@ namespace Playground
 			// Osc.
 			for ( auto & o : in->getOscillators() )
 			{
-				if ( o->active() )
+				if ( o.second->active() )
 				{
 					for ( const auto & note : notes )
 					{
 						// TODO: not the thing to do.
-						buffer[ i ] += o->evaluate( i, note.second );
+						buffer[ i ] += o.second->evaluate( i, note.second );
 					}
 				}
 			}
@@ -80,7 +80,7 @@ namespace Playground
 		{
 			for ( const auto & note : notes )
 			{
-				o->move( p_framesPerBuffer );
+				o.second->move( p_framesPerBuffer );
 			}
 		}
 
@@ -102,20 +102,13 @@ namespace Playground
 		Pa_OpenStream( &_stream, nullptr, &outputParameters, SAMPLE_RATE, FRAME_PER_BUFFER, paNoFlag, _callback, this );
 
 		// Add oscillators.
-		_oscillators.emplace_back( new OscillatorSin() );
-		//_oscillators.emplace_back( new OscillatorSin() );
-		//_oscillators.emplace_back( new OscillatorSin() );
-		_oscillators.emplace_back( new OscillatorSaw() );
-		_oscillators.emplace_back( new OscillatorSquare() );
-		_oscillators.emplace_back( new OscillatorTriangle() );
+		//_oscillators.emplace_back( std::make_unique<OscillatorSin>() );
+		_addOscillator<OscillatorSin>();
+
+		// for (auto & o : o)
 
 		// Add filters.
 		//_filters.emplace_back( new FilterLowPass() );
-
-		for ( auto & o : _oscillators )
-		{
-			o->init();
-		}
 
 		// Start.
 		Pa_StartStream( _stream );
@@ -129,13 +122,43 @@ namespace Playground
 		Pa_Terminate();
 	}
 
-	void Synthetizer::draw()
+	void Synthetizer::_draw()
 	{
 		ImGui::Begin( getName().c_str() );
-		for ( auto & o : _oscillators )
+		// Menu bar.
+		if ( ImGui::BeginMainMenuBar() )
+		{ // Main menu.
+			if ( ImGui::BeginMenu( "Add oscillator" ) )
+			{
+				if ( ImGui::MenuItem( "Sin" ) )
+				{
+					_addOscillator<OscillatorSin>();
+				}
+				if ( ImGui::MenuItem( "Saw" ) )
+				{
+					_addOscillator<OscillatorSaw>();
+				}
+				if ( ImGui::MenuItem( "Square" ) )
+				{
+					_addOscillator<OscillatorSquare>();
+				}
+				if ( ImGui::MenuItem( "Triangle" ) )
+				{
+					_addOscillator<OscillatorTriangle>();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMainMenuBar();
+		}
+
+		std::map<size_t, std::weak_ptr<Oscillator>> oscillators;
+		BaseAudioElement::sharedPtrMapToWeakPtrMap( _oscillators, oscillators );
+		for ( auto & o : oscillators )
 		{
-			ImGui::SetNextItemOpen( true );
-			o->draw();
+			auto weakPtr = o.second.lock();
+			weakPtr->draw();
 		}
 		for ( auto & f : _filters )
 		{
