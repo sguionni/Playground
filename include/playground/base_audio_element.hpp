@@ -7,6 +7,7 @@
 #include <imgui/imgui.h>
 #include <iostream>
 #include <map>
+#include <memory>
 
 namespace Playground
 {
