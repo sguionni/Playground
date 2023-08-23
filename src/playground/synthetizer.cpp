@@ -154,8 +154,7 @@ namespace Playground
 		}
 
 		std::map<size_t, std::weak_ptr<Oscillator>> oscillators;
-		BaseAudioElement::sharedPtrMapToWeakPtrMap( _oscillators, oscillators );
-		for ( auto & o : oscillators )
+		for ( auto & o : BaseAudioElement::sharedPtrMapToWeakPtrMap( _oscillators, oscillators ) )
 		{
 			auto weakPtr = o.second.lock();
 			weakPtr->draw();

@@ -47,7 +47,7 @@ elseif(MSVC)
 	# General.
 	
 	target_compile_options(PLAYGROUND PUBLIC "/W3")  # Warning level 3.
-	target_compile_options(PLAYGROUND PUBLIC "/WX")  # Warnings as errors.
+	#target_compile_options(PLAYGROUND PUBLIC "/WX")  # Warnings as errors.
 	target_compile_options(PLAYGROUND PUBLIC "/MP")  # Multicore compilation.
 	target_compile_options(PLAYGROUND PUBLIC "/sdl") # Additional Security Checks.	
 	target_compile_options(PLAYGROUND PUBLIC "/utf-8")

@@ -36,10 +36,10 @@ namespace Playground
 		}
 
 	  private:
-		libremidi::midi_in			  _midi;
-		std::map<unsigned char, Note> _notes;
-		bool						  _keys[ SDL_NUM_SCANCODES ] = { false };
-		bool						  _mouseButtons[ 3 ]		 = { false };
+		std::unique_ptr<libremidi::midi_in> _midi;
+		std::map<unsigned char, Note>		_notes;
+		bool								_keys[ SDL_NUM_SCANCODES ] = { false };
+		bool								_mouseButtons[ 3 ]		   = { false };
 
 		glm::ivec2 _deltaMouse = { 0, 0 };
 		int		   _deltaWheel = 0;

@@ -1,55 +1,58 @@
 #include "playground/input_manager.hpp"
+#include <iostream>
 
 namespace Playground
 {
 	InputManager::InputManager()
 	{
 		// Init Libremidi.
-		_midi.set_error_callback( []( libremidi::midi_error code, std::string_view info )
-								  { std::cerr << info << std::endl; } );
+
+		_midi = std::make_unique<libremidi::midi_in>( libremidi::input_configuration {
+			[ this ]( const libremidi::message & p_message )
+			{
+				if ( p_message.size() > 0 )
+				{
+					const unsigned char byteStatus	 = p_message[ 0 ];
+					const unsigned char byteKey		 = p_message[ 1 ];
+					const unsigned char byteVelocity = p_message[ 2 ];
+
+					// Key pressed.
+					if ( byteStatus == 0x90 )
+					{
+						_notes.emplace( byteKey, Note( int( byteKey ), int( byteVelocity ) ) );
+					}
+					// Key released.
+					else if ( byteStatus == 0x80 )
+					{
+						assert( _notes.contains( byteKey ) );
+						_notes.erase( byteKey );
+					}
+				}
+			},
+			[]( libremidi::midi_error code, std::string_view info ) { std::cerr << info << std::endl; } } );
+
+		// Loop over all ports.
+
+		libremidi::observer						 obs;
+		const std::vector<libremidi::input_port> inputs = obs.get_input_ports();
 
 		// List devices.
-		for ( unsigned int i = 0, N = _midi.get_port_count(); i < N; i++ )
+		for ( const auto & input : inputs )
 		{
-			std::cout << i << ": " << _midi.get_port_name( i ) << std::endl;
+			std::cout << input.port_name << " " << input.device_name << " " << input.display_name << std::endl;
 		}
 
-		if ( _midi.get_port_count() > 0 )
+		if ( inputs.size() > 0 )
 		{
-			// Open port.
-			_midi.open_port( 0 );
-
-			// Handle messages.
-			_midi.set_callback(
-				[ this ]( const libremidi::message & p_message )
-				{
-					if ( p_message.size() > 0 )
-					{
-						const unsigned char byteStatus	 = p_message[ 0 ];
-						const unsigned char byteKey		 = p_message[ 1 ];
-						const unsigned char byteVelocity = p_message[ 2 ];
-
-						// Key pressed.
-						if ( byteStatus == 0x90 )
-						{
-							_notes.emplace( byteKey, Note( int( byteKey ), int( byteVelocity ) ) );
-						}
-						// Key released.
-						else if ( byteStatus == 0x80 )
-						{
-							assert( _notes.contains( byteKey ) );
-							_notes.erase( byteKey );
-						}
-					}
-				} );
+			_midi->open_port( inputs[ 0 ] );
 		}
 	}
 
 	InputManager::~InputManager()
 	{
-		if ( _midi.is_port_open() )
+		if ( _midi->is_port_open() )
 		{
-			_midi.close_port();
+			_midi->close_port();
 		}
 	}
 

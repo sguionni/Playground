@@ -37,14 +37,16 @@ namespace Playground
 		}
 
 		template<typename K, class T>
-		static inline void sharedPtrMapToWeakPtrMap( const std::map<K, std::shared_ptr<T>> & p_in,
-													 std::map<K, std::weak_ptr<T>> &		 p_out )
+		static inline std::map<K, std::weak_ptr<T>> & sharedPtrMapToWeakPtrMap(
+			const std::map<K, std::shared_ptr<T>> & p_in,
+			std::map<K, std::weak_ptr<T>> &			p_out )
 		{
 			std::transform( p_in.begin(),
 							p_in.end(),
 							std::inserter( p_out, p_out.end() ),
 							[]( const std::pair<K, std::shared_ptr<T>> & p_ptr )
 							{ return std::make_pair( p_ptr.first, std::weak_ptr<T>( p_ptr.second ) ); } );
+			return p_out;
 		}
 
 	  protected:
