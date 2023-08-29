@@ -6,6 +6,8 @@ namespace Playground
 	InputManager::InputManager()
 	{
 		// Init Libremidi.
+		libremidi::observer						 obs;
+		const std::vector<libremidi::input_port> inputs = obs.get_input_ports();
 
 		_midi = std::make_unique<libremidi::midi_in>( libremidi::input_configuration {
 			[ this ]( const libremidi::message & p_message )
@@ -30,11 +32,6 @@ namespace Playground
 				}
 			},
 			[]( libremidi::midi_error code, std::string_view info ) { std::cerr << info << std::endl; } } );
-
-		// Loop over all ports.
-
-		libremidi::observer						 obs;
-		const std::vector<libremidi::input_port> inputs = obs.get_input_ports();
 
 		// List devices.
 		for ( const auto & input : inputs )
