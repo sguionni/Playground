@@ -27,7 +27,7 @@ namespace Playground
 			{
 				for ( auto & o : in->getOscillators() )
 				{
-					o.second->reset();
+					o->reset();
 				}
 				for ( auto & f : in->getFilters() )
 				{
@@ -53,12 +53,12 @@ namespace Playground
 			// Osc.
 			for ( auto & o : in->getOscillators() )
 			{
-				if ( o.second->active() )
+				if ( o->active() )
 				{
 					for ( const auto & note : notes )
 					{
 						// TODO: not the thing to do.
-						buffer[ i ] += o.second->evaluate( i, note.second );
+						buffer[ i ] += o->evaluate( i, note.second );
 					}
 				}
 			}
@@ -80,7 +80,7 @@ namespace Playground
 		{
 			for ( const auto & note : notes )
 			{
-				o.second->move( p_framesPerBuffer );
+				o->move( p_framesPerBuffer );
 			}
 		}
 
@@ -153,12 +153,21 @@ namespace Playground
 			ImGui::EndMainMenuBar();
 		}
 
-		std::map<size_t, std::weak_ptr<Oscillator>> oscillators;
-		for ( auto & o : BaseAudioElement::sharedPtrMapToWeakPtrMap( _oscillators, oscillators ) )
-		{
-			auto weakPtr = o.second.lock();
-			weakPtr->draw();
-		}
+		// 		for ( auto it = _oscillators.rbegin(); it != _oscillators.rend(); ++it )
+		// 		{
+		// 			ImGui::SetNextItemOpen( true );
+		// 			( *it )->draw();
+		// 		}
+
+		// 		std::vector<std::unique_ptr<Oscillator>>::iterator i = _oscillators.end();
+		// 		while ( i != _oscillators.begin() )
+		// 		{
+		// 			--i;
+		// 			/*do stuff */
+		// 			ImGui::SetNextItemOpen( true );
+		// 			( *i )->draw();
+		// 		}
+
 		for ( auto & f : _filters )
 		{
 			ImGui::SetNextItemOpen( true );

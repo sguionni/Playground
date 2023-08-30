@@ -17,7 +17,7 @@ namespace Playground
 	class BaseAudioElement
 	{
 	  public:
-		using CallbackDelete = std::function<void( const size_t )>;
+		using CallbackDelete = std::function<void( BaseAudioElement * )>;
 
 		BaseAudioElement() { _id = BaseAudioElement::_counter++; }
 
@@ -36,6 +36,7 @@ namespace Playground
 			ImGui::PopID();
 		}
 
+		/*
 		template<typename K, class T>
 		static inline std::map<K, std::weak_ptr<T>> & sharedPtrMapToWeakPtrMap(
 			const std::map<K, std::shared_ptr<T>> & p_in,
@@ -48,6 +49,7 @@ namespace Playground
 							{ return std::make_pair( p_ptr.first, std::weak_ptr<T>( p_ptr.second ) ); } );
 			return p_out;
 		}
+		*/
 
 	  protected:
 		static size_t _counter;
@@ -61,7 +63,7 @@ namespace Playground
 		{
 			if ( _callbackDelete )
 			{
-				_callbackDelete( _id );
+				_callbackDelete( this );
 			}
 		}
 
